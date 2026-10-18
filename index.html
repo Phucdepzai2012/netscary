@@ -8,7 +8,7 @@
 <style>
 :root{color-scheme:dark;--bg:#08090d;--line:#ffffff21;--text:#eee9df;--muted:#9b9ba4;--red:#e5484d;--gold:#e8c27a}
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#191a20;color:var(--text);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;outline:none}
 button{font:inherit;cursor:pointer;color:inherit}
 #hud{position:fixed;inset:calc(12px + env(safe-area-inset-top,0px)) 12px auto;z-index:3;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;pointer-events:none}
@@ -80,18 +80,20 @@ h1 span{color:var(--red)}
   <div class="controls" id="controls">WASD: di chuyển · Shift: chạy · E: tương tác · Chuột: nhìn xung quanh · Esc: tạm dừng<br>Điện thoại: kéo nửa trái để di chuyển, kéo nửa phải để nhìn, nút E để tương tác.</div>
   <div class="actions"><button class="primary" id="mainbtn">BẮT ĐẦU CA ĐÊM</button><button class="secondary" id="quietbtn">Âm thanh: bật</button></div>
 </div></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="this.onerror=null;var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';document.head.appendChild(s);"></script>
 <script>
 (function(){
 'use strict';
 const $=id=>document.getElementById(id),THREE=window.THREE;
+window.addEventListener('error',e=>{const panel=document.getElementById('overlay'),story=document.getElementById('story');if(panel&&story&&e.message){panel.style.display='flex';story.textContent='LỖI KHỞI TẠO ĐỒ HỌA: '+e.message+'. Hãy tải lại trang hoặc mở bằng Chrome/Edge mới nhất.';}});
+window.addEventListener('unhandledrejection',e=>{const panel=document.getElementById('overlay'),story=document.getElementById('story');if(panel&&story){panel.style.display='flex';story.textContent='Không thể khởi tạo game: '+String(e.reason||'lỗi không xác định')+'. Hãy tải lại trang.';}});
 if(!THREE){$('heading').textContent='Không tải được đồ họa 3D';$('story').textContent='Hãy kiểm tra kết nối Internet rồi tải lại trang để nạp Three.js.';$('mainbtn').style.display='none';return;}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const fmt=n=>Math.max(0,Math.round(n)).toLocaleString('vi-VN')+'đ';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x070a11);scene.fog=new THREE.FogExp2(0x070a11,.027);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x151821);scene.fog=new THREE.FogExp2(0x151821,.012);
 const camera=new THREE.PerspectiveCamera(73,innerWidth/innerHeight,.08,70);camera.rotation.order='YXZ';
 const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.35));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.domElement.id='world';document.body.prepend(renderer.domElement);
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.NoToneMapping;renderer.toneMappingExposure=1;renderer.domElement.id='world';document.body.prepend(renderer.domElement);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const matCache=new Map();
 function mat(color,roughness=.82,metalness=0){const k=color+'|'+roughness+'|'+metalness;if(!matCache.has(k))matCache.set(k,new THREE.MeshStandardMaterial({color,roughness,metalness}));return matCache.get(k);}
@@ -108,11 +110,12 @@ floorTex.wrapS=floorTex.wrapT=THREE.RepeatWrapping;floorTex.repeat.set(7,9);
 const floorMat=new THREE.MeshStandardMaterial({map:floorTex,roughness:.95});
 const wallMat=mat(0x464343),trim=mat(0x17191e),wood=mat(0x594334),woodDark=mat(0x2b2526),metal=mat(0x565b61,.48,.6),glass=new THREE.MeshStandardMaterial({color:0x243e53,emissive:0x0c1c2c,metalness:.45,roughness:.25}),screenBlack=mat(0x050709,.25);
 const neonMat=new THREE.MeshBasicMaterial({map:signTex('NET HY VỌNG 24H','CHẬM MÀ CHẮC · INTERNET & GAME','#ce404c'),side:THREE.DoubleSide});
-scene.add(new THREE.HemisphereLight(0x8694b0,0x211b1b,.48));
-const mainLight=new THREE.PointLight(0xd6d9ed,1.05,28,1.6);mainLight.position.set(0,4.3,0);mainLight.castShadow=true;mainLight.shadow.mapSize.set(512,512);scene.add(mainLight);
-const redLight=new THREE.PointLight(0xc42e3c,.18,10,2);redLight.position.set(0,2.8,-8.2);scene.add(redLight);
-const blueLight=new THREE.PointLight(0x4d93b7,.5,12,2);blueLight.position.set(-6.5,2.5,0);scene.add(blueLight);
-for(let z of [-6,-1,4]){box(2.4,.12,.34,0,4.15,z,trim);box(2.1,.035,.18,0,4.08,z,mat(0x9aa6a8));const l=new THREE.PointLight(0xc4dbe0,.23,7,2);l.position.set(0,3.95,z);scene.add(l);}
+scene.add(new THREE.HemisphereLight(0xcbd9ff,0x625044,1.8));scene.add(new THREE.AmbientLight(0xbfc5d8,.7));
+const fillLight=new THREE.DirectionalLight(0xe4e9ff,1.15);fillLight.position.set(-4,9,6);scene.add(fillLight);
+const mainLight=new THREE.PointLight(0xd6d9ed,18,48,2);mainLight.position.set(0,4.3,0);scene.add(mainLight);
+const redLight=new THREE.PointLight(0xc42e3c,.55,14,2);redLight.position.set(0,2.8,-8.2);scene.add(redLight);
+const blueLight=new THREE.PointLight(0x4d93b7,2.1,18,2);blueLight.position.set(-6.5,2.5,0);scene.add(blueLight);
+for(let z of [-6,-1,4]){box(2.4,.12,.34,0,4.15,z,trim);box(2.1,.035,.18,0,4.08,z,mat(0x9aa6a8));const l=new THREE.PointLight(0xc4dbe0,2.4,12,2);l.position.set(0,3.95,z);scene.add(l);}
 box(18,.32,22,0,-.2,-.5,floorMat);box(18,.45,22,0,4.45,-.5,mat(0x17191e));
 /* Ghép tường thành nhiều mảng; cửa hậu là lối mở duy nhất dẫn đến ending bí mật. */
 box(.35,4.3,20.8,-8.65,2,-.5,wallMat);box(.35,4.3,20.8,8.65,2,-.5,wallMat);
@@ -143,7 +146,7 @@ for(let side of [-1,1])for(let i=0;i<4;i++){
  box(.18,.16,.2,x-side*.15,.91,z,metal);box(.42,.035,.28,x-side*.38,.855,z+.37,trim);box(.06,.035,.18,x-side*.38,.878,z+.37,metal);box(.32,.48,.38,x-side*.49,.54,z+.65,pcMat);
  const led=box(.03,.035,.03,x-side*.49,.55,z+.45,ledMat);
  box(.6,.12,.57,s.seatX,.57,z,chairMat);box(.55,.48,.1,s.seatX,.83,z+(side<0?-.3:.3),chairMat);box(.09,.42,.09,s.seatX,.29,z,metal);box(.65,.07,.65,s.seatX,.08,z,chairMat);
- const lamp=new THREE.PointLight(s.own?0x77c8d2:0x343943,s.own?.2:.04,3.3,2);lamp.position.set(x-side*.3,1.55,z);scene.add(lamp);
+ const lamp=new THREE.PointLight(s.own?0x77c8d2:0x343943,s.own?1.15:.12,5.5,2);lamp.position.set(x-side*.3,1.55,z);scene.add(lamp);
  s.screen=scr;s.led=led;s.lamp=lamp;slots.push(s);
 }
 /* Quầy trả nợ, đồ ăn nhanh và bình nước. */
@@ -185,8 +188,8 @@ function buildHuman(kind,shirtColor){
 const START_MONEY=1500000,START_DEBT=10000000,DAY_LENGTH=88,MACHINE_PRICE=480000;
 let money=START_MONEY,debt=START_DEBT,day=1,dayT=0,sessionT=2.5,gameStarted=false,soundOn=true,audio=null,hum=null;
 let hunger=100,thirst=100,health=100,stamina=100,threat=null,threatTimer=48,threatCooldown=0,elapsed=0,mouseDown=false,state='menu';
-const P={x:0,z:5.3,yaw:0,pitch:0},keys=Object.create(null),touchMove={x:0,y:0};let leftTouch=null,rightTouch=null;
-function updateScreen(s){s.screen.material.map=screenTex(s.lv);s.screen.material.needsUpdate=true;s.led.material=s.own?mat(s.lv===1?0x6fd6dc:s.lv===2?0x9be8a7:0xff5962):mat(0x272b31);s.lamp.color.setHex(s.own?(s.lv===3?0xff6363:0x75d8df):0x343943);s.lamp.intensity=s.own?.23:0.035;}
+const P={x:0,z:2.5,yaw:0,pitch:0},keys=Object.create(null),touchMove={x:0,y:0};let leftTouch=null,rightTouch=null;
+function updateScreen(s){s.screen.material.map=screenTex(s.lv);s.screen.material.needsUpdate=true;s.led.material=s.own?mat(s.lv===1?0x6fd6dc:s.lv===2?0x9be8a7:0xff5962):mat(0x272b31);s.lamp.color.setHex(s.own?(s.lv===3?0xff6363:0x75d8df):0x343943);s.lamp.intensity=s.own?1.0:0.08;}
 slots.forEach(s=>updateScreen(s));
 const customerList=[];
 function say(text){$('toast').textContent=text;$('toast').classList.add('show');say.clock=2.8;}
@@ -299,7 +302,7 @@ function updateWorld(dt){
  const target=getTarget();$('prompt').textContent=targetText(target);$('prompt').style.opacity=target?'1':'0';
  for(const c of clues){if(!c.found){const d=dist(P,[c.pos[0],c.pos[2]]);c.glow.intensity=d<5?.38:0;c.group.rotation.y+=dt*.12;}}
  for(const s of slots){if(s.cash>0){s.led.material=mat(0xf0cb72);s.lamp.intensity=.4+.15*Math.sin(elapsed*4);}else if(s.own){s.led.material=mat(s.lv===3?0xff5962:0x78d4dc);s.lamp.intensity=.15+.06*Math.sin(elapsed*2);}}
- mainLight.intensity=.9+Math.sin(elapsed*1.7)*.035+(day>=3&&Math.sin(elapsed*23)>.985?0.5:0);redLight.intensity=threat?1.1:.12+Math.sin(elapsed*2)*.025;
+ mainLight.intensity=18+Math.sin(elapsed*1.7)*.6+(day>=3&&Math.sin(elapsed*23)>.985?4:0);redLight.intensity=threat?1.1:.12+Math.sin(elapsed*2)*.025;
  if(threat&&health<38)$('danger').style.opacity=.25+Math.sin(elapsed*8)*.11;else if(!threat)$('danger').style.opacity=0;
  if(say.clock>0){say.clock-=dt;if(say.clock<=0)$('toast').classList.remove('show');}
  updateStats();
