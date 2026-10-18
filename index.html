@@ -128,6 +128,9 @@ box(5.9,4.3,.25,-5.95,2,9.75,wallMat);box(5.9,4.3,.25,5.95,2,9.75,wallMat);
 for(let y=0.25;y<3.9;y+=.21)box(2.6,.045,.07,0,y,9.5,metal);
 for(const side of [-1,1])for(const z of [-5.3,.2,5.6]){box(.08,1.35,2.35,side*8.43,2.55,z,trim);box(.04,1.12,2.08,side*8.37,2.55,z,glass);box(.1,.07,2.25,side*8.31,2.55,z,metal);box(.1,1.2,.07,side*8.31,2.55,z,metal);}
 plane(7,1.5,0,3.15,9.45,neonMat,Math.PI);
+/* Biển hiệu phía tường đối diện: vật liệu phát sáng, không phụ thuộc đèn trong phòng. */
+const backSignMat=new THREE.MeshBasicMaterial({map:signTex('NET HY VỌNG','NẾU THẤY BIỂN HIỆU, 3D ĐÃ RENDER','#ff4b65'),side:THREE.DoubleSide});
+plane(6.2,1.35,0,3.0,-10.58,backSignMat,0);
 plane(1.85,.72,0,1.05,9.45,new THREE.MeshBasicMaterial({map:signTex('SANG QUÁN','LIÊN HỆ: 09XX XXX XXX','#e3b25e'),side:THREE.DoubleSide}),Math.PI);
 /* Bàn ghế, quạt trần, bảng nội quy và chi tiết cũ kỹ. */
 for(const x of [-3.1,3.1]){box(.8,.12,.8,x,3.98,-1,metal);box(.16,.55,.16,x,3.67,-1,trim);for(let i=0;i<4;i++){const b=box(.95,.045,.18,x,3.91,-1,mat(0x55565a));b.rotation.y=i*Math.PI/2;}}
@@ -308,7 +311,17 @@ function updateWorld(dt){
  updateStats();
 }
 camera.position.set(P.x,1.66,P.z);camera.rotation.set(0,0,0);updateStats();
-function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-(loop.last||now))/1000,.04);loop.last=now;if(state==='play')updateWorld(dt);renderer.render(scene,camera);}
+function loop(now){
+ requestAnimationFrame(loop);
+ try{
+  const dt=Math.min((now-(loop.last||now))/1000,.04);loop.last=now;
+  if(state==='play')updateWorld(dt);
+  renderer.render(scene,camera);
+ }catch(err){
+  console.error('NET HY VỌNG render error:',err);
+  state='error';$('overlay').style.display='flex';$('eyebrow').textContent='LỖI KỸ THUẬT';$('heading').textContent='GAME GẶP LỖI';$('story').textContent=String(err&&err.stack||err||'Không rõ nguyên nhân');$('cards').style.display='none';$('controls').style.display='block';$('mainbtn').textContent='TẢI LẠI GAME';$('mainbtn').onclick=()=>location.reload();
+ }
+}
 requestAnimationFrame(loop);
 })();
 </script>
