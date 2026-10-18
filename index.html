@@ -1,450 +1,324 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#08090f">
-<title>NETSCARY — XO CLUB</title>
+<meta name="theme-color" content="#0a0e13">
+<title>Market Lab — Paper Trading</title>
 <style>
-:root{color-scheme:dark;--bg:#090a10;--panel:#12141ced;--line:#ffffff20;--ink:#f4f0e8;--muted:#aaaab5;--gold:#e8c58a;--red:#ec5368;--x-color:#58e4ff;--o-color:#ff668c;--board-color:#111923;--glow-color:#ec5368}
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{color-scheme:dark;--bg:#0a0e13;--side:#0c1117;--panel:#111821;--panel2:#151f29;--line:#25303b;--line2:#344251;--text:#edf3f8;--muted:#8998a8;--soft:#b8c3cf;--green:#43d6a1;--red:#ff6e7d;--mint:#a0f0ca;--blue:#89aaff;--gold:#e8c98f;--radius:14px}
 *{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-body{isolation:isolate}
-button,input,select{font:inherit}
-button{color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-#world{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
-#ambient{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 76% 40%,#24233124,transparent 49%),linear-gradient(90deg,#090a10 0%,#090a10ed 36%,#090a1040 70%,#090a1060 100%)}
-#loading{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:#090a10;transition:opacity .5s,visibility .5s}
-#loading.done{opacity:0;visibility:hidden}
-.loadbox{width:min(300px,80vw);text-align:center}
-.loadlogo{font-size:12px;letter-spacing:.28em;color:var(--gold);font-weight:900}
-.loadbar{height:3px;margin-top:18px;background:#ffffff1a;border-radius:9px;overflow:hidden}
-.loadbar i{display:block;height:100%;width:18%;background:var(--red);animation:load 1.1s ease forwards}
-@keyframes load{to{width:100%}}
-#brand{position:fixed;top:clamp(18px,4vh,38px);left:clamp(18px,4vw,54px);z-index:3;display:flex;gap:12px;align-items:center;pointer-events:none}
-.brandmark{width:37px;height:37px;border:1px solid #ffffff35;background:#11131c;border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:950;letter-spacing:-.1em;box-shadow:0 0 24px #e8536820}
-.brandname{font-size:12px;font-weight:950;letter-spacing:.19em}
-.brandtag{font-size:9px;letter-spacing:.16em;color:#858694;margin-top:2px}
-#sceneStatus{position:fixed;right:22px;top:28px;z-index:3;display:flex;gap:7px;align-items:center;font-size:10px;letter-spacing:.12em;color:#b6b5bf;text-transform:uppercase}
-.pulse{height:6px;width:6px;border-radius:50%;background:#7be0a8;box-shadow:0 0 12px #7be0a8}
-#layout{position:fixed;inset:0;z-index:2;display:flex;align-items:center;padding:clamp(76px,12vh,116px) 0 clamp(25px,6vh,58px) clamp(18px,4vw,58px);pointer-events:none}
-#leftPanel{pointer-events:auto;width:min(470px,46vw);max-height:100%;overflow:auto;scrollbar-width:thin;scrollbar-color:#ffffff22 transparent;padding:clamp(18px,3vw,35px);border:1px solid #ffffff1d;border-radius:18px;background:linear-gradient(145deg,#12141ceF,#0c0e15e8);box-shadow:0 30px 100px #0007,0 1px #ffffff08 inset;backdrop-filter:blur(22px);position:relative}
-#leftPanel:before{content:"";position:absolute;top:0;left:28px;width:80px;height:2px;background:var(--glow-color);box-shadow:0 0 18px var(--glow-color)}
-.eyebrow{font-size:10px;line-height:1.5;font-weight:850;letter-spacing:.21em;text-transform:uppercase;color:var(--gold)}
-h1{font-size:clamp(28px,3.6vw,43px);line-height:1.03;letter-spacing:-.055em;margin:12px 0 10px;font-weight:950}
-h1 .accent{color:var(--red)}
-.lede{color:#a6a7b2;font-size:13px;line-height:1.75;margin:0 0 22px;max-width:380px}
-.tagrow{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0 23px}
-.tag{padding:5px 8px;border:1px solid #ffffff18;background:#ffffff05;border-radius:5px;font-size:9px;letter-spacing:.12em;color:#a8a8b3}
-.view{display:none}
-.view.active{display:block;animation:enter .25s ease both}
-@keyframes enter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border:1px solid #ffffff13;background:#090b11;border-radius:9px;margin:18px 0}
-.tab{border:0;border-radius:6px;background:transparent;color:#9e9fac;font-size:12px;font-weight:800;padding:10px}
-.tab.active{background:#242631;color:white;box-shadow:0 1px #ffffff16 inset}
-.field{display:block;margin:12px 0}
-.field span{display:block;font-size:10px;color:#aaaab5;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
-.field input,.field select{width:100%;height:44px;border-radius:8px;border:1px solid #ffffff1b;background:#090b12;color:#f4f0e8;padding:0 12px}
-.field input::placeholder{color:#626573}
-.primary,.secondary,.menuButton{border-radius:9px;border:1px solid #ffffff1d;min-height:45px;padding:11px 14px;font-size:12px;font-weight:900;letter-spacing:.095em;text-transform:uppercase;transition:transform .16s,border-color .16s,background .16s,box-shadow .16s}
-.primary{width:100%;color:#fff;background:linear-gradient(110deg,#b92e4a,#ed5368);border-color:#ff85934c;box-shadow:0 9px 27px #dc3f591e}
-.primary:hover,.menuButton:hover,.secondary:hover{transform:translateY(-2px);border-color:#ffffff56}
-.secondary{background:#ffffff06}
-.fullButton{width:100%;margin-top:10px}
-.smallNote{font-size:10px;line-height:1.7;color:#777987;margin-top:15px}
-.inlineActions{display:flex;gap:9px;margin-top:13px}
-.inlineActions>*{flex:1}
-#authMessage{min-height:18px;margin-top:10px;color:#efc98b;font-size:11px;line-height:1.5}
-.menuButtons{display:grid;gap:9px;margin-top:22px}
-.menuButton{width:100%;display:flex;align-items:center;gap:13px;text-align:left;background:#ffffff05;padding:13px 14px;min-height:63px}
-.menuButton .num{font-size:10px;color:var(--gold);border:1px solid #ffffff20;border-radius:6px;width:30px;height:30px;display:grid;place-items:center;flex:none}
-.menuButton .mtext{flex:1}
-.menuButton strong{display:block;font-size:12px;letter-spacing:.12em}
-.menuButton small{display:block;margin-top:3px;color:#8f919e;font-size:10px;letter-spacing:.02em;text-transform:none;font-weight:500}
-.menuButton .arrow{font-size:17px;color:#777987}
-.menuButton[data-aim="play"]:hover,.menuButton[data-aim="play"]:focus-visible{border-color:var(--x-color);box-shadow:0 0 24px color-mix(in srgb,var(--x-color),transparent 87%)}
-.menuButton[data-aim="settings"]:hover,.menuButton[data-aim="settings"]:focus-visible{border-color:var(--gold)}
-.menuButton[data-aim="exit"]:hover,.menuButton[data-aim="exit"]:focus-visible{border-color:var(--red);box-shadow:0 0 24px #ec53681a}
-.userBadge{display:inline-flex;gap:8px;align-items:center;border:1px solid #ffffff18;border-radius:7px;padding:7px 9px;font-size:10px;color:#b5b6c0;margin-top:5px}
-.userDot{height:7px;width:7px;background:#78d9a5;border-radius:50%}
-.viewHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:13px 0 19px}
-.viewHeading h2{font-size:22px;margin:0;letter-spacing:-.03em}
-.backBtn{border:1px solid #ffffff20;background:#ffffff08;border-radius:7px;padding:8px 10px;font-size:10px;font-weight:800;letter-spacing:.1em}
-.settingRow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid #ffffff12}
-.settingLabel strong{display:block;font-size:12px}
-.settingLabel small{display:block;margin-top:4px;color:#8d8f9b;font-size:10px;line-height:1.5}
-input[type=color]{width:48px;height:35px;border:1px solid #ffffff38;border-radius:7px;background:#12141c;padding:3px;cursor:pointer}
-input[type=range]{width:110px;accent-color:var(--red)}
-.settingsFooter{display:flex;gap:8px;margin-top:20px}
-.settingsFooter button{flex:1}
-#gameView .lede{margin-bottom:12px}
-.gameInfo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
-.turnBadge{font-size:11px;font-weight:900;letter-spacing:.1em;border:1px solid #ffffff1d;border-radius:7px;padding:8px 10px;background:#ffffff05}
-#turnMark{font-size:15px;color:var(--x-color)}
-.modePick{border:1px solid #ffffff1a;border-radius:7px;background:#0a0c13;color:#ddd;padding:8px 9px;font-size:10px;max-width:165px}
-#board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,340px);margin:0 auto 16px}
-.cell{aspect-ratio:1;border:1px solid #ffffff1e;border-radius:12px;background:var(--board-color);font-size:clamp(30px,5vw,52px);font-weight:950;display:grid;place-items:center;box-shadow:0 5px 18px #0003;transition:transform .13s,background .13s,border-color .13s}
-.cell:hover:empty{transform:translateY(-2px);border-color:#ffffff6b;background:#1a202d}
-.cell.x{color:var(--x-color);text-shadow:0 0 24px color-mix(in srgb,var(--x-color),transparent 65%)}
-.cell.o{color:var(--o-color);text-shadow:0 0 24px color-mix(in srgb,var(--o-color),transparent 65%)}
-.cell.winner{background:#ffffff13;border-color:var(--gold);box-shadow:0 0 23px #e8c58a19}
-.gameActions{display:flex;gap:8px}
-.gameActions button{flex:1}
-#gameMessage{min-height:18px;font-size:11px;text-align:center;color:#b7b6c0;margin:10px 0}
-.exitCard{border:1px solid #ffffff1c;background:#090b12;border-radius:10px;padding:17px}
-.exitCard strong{font-size:14px}
-.exitCard p{font-size:12px;line-height:1.7;color:#9ea0ab}
-.footerLine{display:flex;justify-content:space-between;gap:12px;color:#636675;font-size:9px;letter-spacing:.11em;text-transform:uppercase;margin-top:23px;padding-top:15px;border-top:1px solid #ffffff12}
-#sceneError{display:none;position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:15;background:#161019;border:1px solid #ec536866;color:#ffdce2;border-radius:8px;padding:10px 14px;font-size:11px;max-width:90vw;text-align:center}
-@media(max-width:760px){
- #sceneStatus{top:17px;right:15px;font-size:8px}
- #brand{top:15px;left:15px}.brandmark{width:31px;height:31px}
- #layout{padding:65px 13px 13px;align-items:flex-end;justify-content:flex-start}
- #leftPanel{width:min(100%,500px);max-height:min(73dvh,720px);padding:20px;border-radius:15px;background:linear-gradient(145deg,#11131cee,#0b0d14f3)}
- h1{font-size:31px}
- .lede{font-size:12px;margin-bottom:14px}
- #board{width:min(100%,290px);gap:6px}
- .cell{border-radius:9px}
- .footerLine{margin-top:15px}
-}
-@media(max-width:420px){#layout{padding:58px 8px 8px}#leftPanel{padding:16px;max-height:78dvh}.menuButton{min-height:56px;padding:10px}.menuButton small{font-size:9px}.tagrow{margin:12px 0 16px}.settingRow{padding:10px 0}}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',Inter,system-ui,sans-serif;font-size:13px}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.hidden{display:none!important}.mono,.num{font-family:'DM Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}.positive{color:var(--green)!important}.negative{color:var(--red)!important}.muted{color:var(--muted)!important}
+button{color:inherit}.icon{width:17px;height:17px;display:inline-block;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);font-weight:750}
+.logo{display:flex;align-items:center;gap:10px}.logoMark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#b8f5d8,#42b98b);color:#082018;font:900 18px 'Space Grotesk',sans-serif;box-shadow:0 0 24px #5ce7b71b}.logoText{font:700 14px 'Space Grotesk',sans-serif;letter-spacing:.015em}.logoText small{display:block;color:var(--muted);font:9px 'DM Mono',monospace;letter-spacing:.15em;margin-top:3px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 13px;min-height:37px;border:1px solid var(--line2);border-radius:9px;background:#ffffff04;color:var(--text);font-weight:650;transition:background .15s,border-color .15s,transform .15s}.btn:hover{background:#ffffff0c;border-color:#526171}.btn.primary{background:var(--mint);border-color:var(--mint);color:#081811;font-weight:800}.btn.primary:hover{background:#c1ffdf}.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}.btn.ghost:hover{background:#ffffff08;color:var(--text)}.btn.buy{background:#43d6a014;border-color:#43d6a047;color:#82edc2}.btn.sell{background:#ff6e7d10;border-color:#ff6e7d46;color:#ff9aa4}.btn.small{min-height:29px;padding:6px 9px;font-size:10px}.btn.full{width:100%;min-height:43px}
+#authScreen{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(370px,.92fr);background:radial-gradient(ellipse at 18% 28%,#1a493755,transparent 42%),radial-gradient(ellipse at 78% 90%,#2e436035,transparent 40%),#0a0e13}
+.authVisual{position:relative;min-height:100vh;padding:35px clamp(25px,5.5vw,82px);display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;border-right:1px solid #ffffff0c}.authVisual:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0a0e1330 1px,transparent 1px),linear-gradient(#0a0e1330 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(to bottom,#000,transparent 90%);pointer-events:none}
+.authHero{position:relative;z-index:1;max-width:720px;margin:auto 0;padding:36px 0}.authHero .eyebrow{color:#a0eaca;display:flex;align-items:center;gap:9px}.liveDot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #43d6a0}.authHero h1{font:600 clamp(42px,6.2vw,85px)/.99 'Space Grotesk',sans-serif;letter-spacing:-.075em;margin:23px 0}.authHero h1 span{color:var(--mint)}.authHero p{max-width:450px;color:#a0acba;font-size:14px;line-height:1.85;margin:0}.authStats{display:flex;gap:34px;margin-top:34px}.authStat strong{display:block;font:600 19px 'Space Grotesk',sans-serif}.authStat span{display:block;font-size:10px;color:#788898;margin-top:5px}.visualChart{position:absolute;left:0;right:0;bottom:80px;height:26%;opacity:.6;pointer-events:none}.authFoot{position:relative;z-index:1;color:#596879;font:9px 'DM Mono',monospace;letter-spacing:.1em;display:flex;justify-content:space-between;gap:12px}
+.authRight{min-height:100vh;display:grid;place-items:center;padding:32px 26px;position:relative}.authRight:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 5%,#183c3030,transparent 55%);pointer-events:none}.authBox{position:relative;width:min(390px,100%)}.authWelcome{margin-bottom:23px}.authWelcome h2{font:600 27px 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 8px}.authWelcome p{color:var(--muted);line-height:1.7;margin:0;font-size:12px}.authPill{display:inline-flex;align-items:center;gap:7px;border:1px solid #43d6a02b;background:#43d6a00b;padding:6px 8px;border-radius:100px;color:#9becc5;font-size:9px;letter-spacing:.1em;font-weight:750;margin-bottom:13px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:#080b10;border:1px solid var(--line);border-radius:10px;margin:18px 0}.authTab{border:0;border-radius:7px;background:transparent;color:var(--muted);padding:10px;font-weight:700}.authTab.active{background:#202b35;color:var(--text);box-shadow:0 1px #ffffff13 inset}
+.field{display:block;margin:13px 0}.fieldLabel{display:flex;justify-content:space-between;gap:10px;color:#c6ced8;font-size:10px;font-weight:700;margin-bottom:7px}.field input,.field select{width:100%;height:43px;padding:0 12px;background:#0c1118;border:1px solid var(--line2);border-radius:9px;color:var(--text);outline:none}.field input:focus,.field select:focus{border-color:#85dcb8;box-shadow:0 0 0 3px #43d6a015}.field input::placeholder{color:#536071}.authSubmit{width:100%;margin-top:8px;height:44px}.authFeedback{min-height:18px;color:var(--gold);font-size:11px;line-height:1.5;margin-top:10px}.finePrint{font-size:10px;color:#687484;line-height:1.7;margin-top:20px}
+#appShell{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:224px;z-index:5;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:21px 13px 14px}.sidebar .logo{padding:0 9px 24px}.workspace{font-size:9px;color:#667586;letter-spacing:.15em;font-weight:750;text-transform:uppercase;padding:13px 12px 8px}.navList{display:grid;gap:4px}.navBtn{width:100%;display:flex;align-items:center;gap:12px;border:1px solid transparent;background:transparent;color:#8d9aaa;border-radius:9px;padding:10px 12px;text-align:left;min-height:41px;font-size:12px;font-weight:650}.navBtn:hover{color:var(--text);background:#ffffff05}.navBtn.active{color:#adf3d2;background:linear-gradient(90deg,#43d6a018,#43d6a004);border-color:#43d6a021}.navBtn .navHint{margin-left:auto;color:#637385;font:9px 'DM Mono',monospace}.sidebarSpacer{flex:1}.simCard{margin:12px 3px 15px;padding:12px;border-radius:11px;background:linear-gradient(145deg,#18271f,#121b1d);border:1px solid #345143}.simCard .simTag{font-size:9px;letter-spacing:.1em;color:#9ee9c6;font-weight:800}.simCard p{font-size:10px;color:#91a69e;line-height:1.6;margin:8px 0 0}.profileRow{display:flex;align-items:center;gap:9px;padding:12px 5px 0;border-top:1px solid var(--line)}.avatar{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#26372e;color:#9af0c5;font-weight:800;border:1px solid #3a5a49}.profileName{font-size:11px;font-weight:750;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.profileType{font-size:9px;color:var(--muted);margin-top:3px}#logoutBtn{margin-left:auto;border:0;background:transparent;color:#8290a1;padding:6px}
+#appMain{margin-left:224px;min-height:100vh}.topbar{height:68px;position:sticky;top:0;z-index:4;display:flex;align-items:center;gap:17px;padding:0 28px;background:#0a0e13ed;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.breadcrumb{font-size:11px;color:#7e8c9c;white-space:nowrap}.breadcrumb strong{color:#e7edf4;font-weight:750}.searchBox{position:relative;display:flex;align-items:center;gap:9px;width:min(330px,32vw);margin-left:auto}.searchBox .icon{position:absolute;left:12px;color:#758397}.searchBox input{width:100%;height:36px;padding:0 40px 0 37px;border:1px solid var(--line);border-radius:9px;background:#0f141c;color:var(--text);font-size:11px}.searchBox input::placeholder{color:#718094}.searchShortcut{position:absolute;right:9px;color:#5e6b7c;font:9px 'DM Mono',monospace;border:1px solid var(--line);padding:3px 5px;border-radius:4px}.topActions{display:flex;align-items:center;gap:9px}.marketState{display:flex;align-items:center;gap:7px;color:#9aabb6;font-size:9px;white-space:nowrap;letter-spacing:.08em}.marketState .liveDot{width:5px;height:5px}.topIcon{width:34px;height:34px;border:1px solid var(--line);background:#ffffff03;border-radius:9px;color:#9aa6b6;display:grid;place-items:center}.topAvatar{width:33px;height:33px;border:1px solid #3d5949;background:#203229;color:#abf1d0;border-radius:50%;font-size:10px;font-weight:800}
+.content{max-width:1650px;margin:0 auto;padding:27px 27px 42px}.page{display:none;animation:fadeIn .2s ease}.page.active{display:block}@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}.pageIntro{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:21px}.pageIntro h1{font:600 27px 'Space Grotesk',sans-serif;letter-spacing:-.045em;margin:6px 0}.pageIntro p{font-size:11px;color:var(--muted);margin:0;line-height:1.7}.introActions{display:flex;gap:8px;align-items:center}.demoLabel{display:inline-flex;align-items:center;gap:7px;border:1px solid #e5c58b2a;background:#e5c58b09;color:#e5c58b;padding:7px 9px;border-radius:7px;font:9px 'DM Mono',monospace;white-space:nowrap}.demoLabel .liveDot{background:var(--gold);box-shadow:0 0 10px #e5c58b40}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:15px}.metric{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;min-width:0}.metricTop{display:flex;justify-content:space-between;align-items:center;gap:9px}.metricLabel{color:#9aa7b6;font-size:10px;font-weight:650}.metricIcon{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;color:#a8b5c5}.metricValue{font:600 clamp(18px,1.8vw,24px) 'Space Grotesk',sans-serif;letter-spacing:-.045em;margin:12px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metricFoot{display:flex;align-items:center;gap:6px;color:#8c9aaa;font-size:9px;line-height:1.5}.delta{font:9px 'DM Mono',monospace}.miniSpark{width:54px;height:23px;margin-left:auto;flex:none}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);min-width:0;overflow:hidden}.panelHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #ffffff0c}.panelTitle{font-size:11px;font-weight:800}.panelSub{color:var(--muted);font-size:9px;margin-top:4px}.chartLayout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,.85fr);gap:14px;margin-bottom:14px}.chartTop{display:flex;justify-content:space-between;align-items:flex-start;gap:13px;padding:18px 18px 11px}.assetHeadline{display:flex;align-items:center;gap:10px;min-width:0}.assetLogo{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:10px;background:#202b35;color:#dce9f4;font:800 11px 'Space Grotesk',sans-serif;border:1px solid #ffffff12}.assetName{font-size:11px;font-weight:800;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.assetCompany{font-size:9px;color:var(--muted);margin-top:4px}.chartPrice{font:600 25px 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin-top:15px}.chartChange{font:10px 'DM Mono',monospace;margin-top:5px}.chartTools{display:flex;gap:4px;align-items:center;flex-wrap:wrap}.toolButton{border:1px solid transparent;border-radius:6px;background:transparent;color:#8592a2;font-size:9px;padding:6px 7px}.toolButton.active{background:#26332e;color:#a4edca;border-color:#385345}.chartType{margin-left:4px;border-left:1px solid var(--line);padding-left:7px;display:flex;gap:2px}.chartCanvasWrap{height:250px;position:relative;padding:0 8px 8px}.chartCanvas{display:block;width:100%;height:100%}.chartLegend{display:flex;align-items:center;gap:12px;font-size:9px;color:#7d8c9e;padding:0 18px 13px}.legendDot{height:6px;width:6px;border-radius:50%;background:var(--green)}.chartBottom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 18px;border-top:1px solid #ffffff0b;color:#7e8c9c;font-size:9px}.chartBottom strong{color:#cbd4df;font-weight:700}.watchlistRows{padding:2px 13px}.stockRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:11px 4px;border-bottom:1px solid #ffffff0b;cursor:pointer}.stockRow:last-child{border-bottom:0}.stockRow:hover{background:#ffffff04}.stockIdentity{display:flex;align-items:center;gap:8px;min-width:0}.stockMini{height:30px;width:30px;border-radius:9px;border:1px solid #ffffff0c;display:grid;place-items:center;font:800 9px 'Space Grotesk',sans-serif;flex:none}.stockSymbol{font-size:10px;font-weight:850}.stockCompany{font-size:9px;color:var(--muted);margin-top:3px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:130px}.stockPrice{text-align:right;font:10px 'DM Mono',monospace}.stockChange{text-align:right;font:9px 'DM Mono',monospace;margin-top:4px}.seeAll{color:#9de8c6;font-size:9px;font-weight:800;text-decoration:none;border:0;background:transparent;padding:4px}.seeAll:hover{color:#d3ffe9}.lowerGrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.9fr);gap:14px}.dataTable{width:100%;border-collapse:collapse;white-space:nowrap}.dataTable th{text-align:right;color:#728095;font-size:8px;letter-spacing:.09em;text-transform:uppercase;font-weight:750;padding:12px 13px;border-bottom:1px solid #ffffff0d}.dataTable td{text-align:right;padding:12px 13px;border-bottom:1px solid #ffffff0b;font-size:10px;color:#cad2dd}.dataTable tr:last-child td{border-bottom:0}.dataTable th:first-child,.dataTable td:first-child{text-align:left}.dataTable tbody tr:hover{background:#ffffff04}.tableWrap{overflow:auto}.tableAsset{display:flex;align-items:center;gap:8px}.tableAsset .stockMini{width:28px;height:28px}.tablePrimary{font-weight:800;color:#eaf0f5}.tableSecondary{font-size:8px;color:#7f8da0;margin-top:3px}.rowActions{display:flex;justify-content:flex-end;gap:4px}.emptyState{text-align:center;color:#7d8a9a;padding:27px 12px;line-height:1.7;font-size:10px}.filterRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.filterSelect,.modeSelect{height:31px;border:1px solid var(--line);background:#0d1219;color:#aebaca;border-radius:7px;padding:0 9px;font-size:10px}.searchInline{height:32px;min-width:175px;padding:0 10px;border-radius:8px;border:1px solid var(--line);background:#0d1219;color:var(--text);font-size:10px}.marketTable tbody tr{cursor:pointer}.portfolioHero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(250px,.65fr);gap:13px;margin-bottom:15px}.balanceLarge{padding:21px 22px;background:linear-gradient(130deg,#14231e,#101a1c 70%,#10151d);border:1px solid #335446;border-radius:var(--radius)}.balanceLarge .big{font:600 clamp(28px,3vw,40px) 'Space Grotesk',sans-serif;letter-spacing:-.05em;margin:12px 0 9px}.balanceLarge p{font-size:10px;color:#93ab9f;line-height:1.7;margin:0}.allocation{padding:18px}.allocationCanvas{height:130px;width:100%;display:block}.legendList{display:grid;gap:9px;margin-top:8px}.legendItem{display:flex;align-items:center;gap:8px;font-size:9px;color:#aab5c2}.legendItem .dot{width:7px;height:7px;border-radius:2px}.legendItem strong{margin-left:auto;font:9px 'DM Mono',monospace;color:#dce4ec}.kpiGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:14px}.kpi{padding:15px;border:1px solid var(--line);border-radius:12px;background:#ffffff02}.kpi span{font-size:9px;color:var(--muted)}.kpi strong{display:block;font:600 17px 'Space Grotesk',sans-serif;margin-top:9px}.activityIcon{width:28px;height:28px;display:grid;place-items:center;border-radius:9px;font-weight:850}.activityIcon.buy{background:#43d6a015;color:#77e9bd}.activityIcon.sell{background:#ff687813;color:#ff8d9a}.learnGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.learnCard{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);padding:19px;min-height:185px}.learnNum{font:10px 'DM Mono',monospace;color:#8ce6bf}.learnCard h3{font-size:14px;margin:17px 0 9px}.learnCard p{color:#8c99a9;line-height:1.8;font-size:10px;margin:0}.tipBox{margin-top:14px;padding:15px;border:1px solid #e5c58b2d;background:#e5c58b08;border-radius:11px;color:#d7c49f;font-size:10px;line-height:1.8}.settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.settingPanel{padding:19px}.settingPanel h3{font-size:12px;margin:0 0 15px}.settingsLine{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0;border-bottom:1px solid #ffffff0e}.settingsLine:last-child{border-bottom:0}.settingsLine strong{display:block;font-size:10px}.settingsLine small{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.6}.settingsLine select,.settingsLine input[type=checkbox]{accent-color:var(--mint)}.settingsLine select{border:1px solid var(--line);background:#0c1118;color:var(--text);border-radius:7px;padding:7px;font-size:10px}
+#toast{position:fixed;z-index:30;right:20px;bottom:20px;max-width:min(380px,calc(100vw - 30px));padding:12px 15px;background:#171f28;border:1px solid #3e4b5b;border-radius:10px;box-shadow:0 16px 44px #0005;font-size:10px;line-height:1.6;opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none}#toast.show{opacity:1;transform:translateY(0)}
+#tradeModal{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:16px;background:#02050bd9;backdrop-filter:blur(9px)}#tradeModal.open{display:flex}.tradeBox{width:min(430px,100%);background:#111720;border:1px solid #344050;border-radius:16px;box-shadow:0 24px 90px #0009;overflow:hidden}.tradeHeader{padding:17px 19px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.tradeHeader h2{font:600 18px 'Space Grotesk',sans-serif;margin:0}.closeBtn{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:#ffffff05;color:#9eabbc}.tradeBody{padding:19px}.tradeTabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;background:#0a0e14;border:1px solid var(--line);border-radius:9px;margin-bottom:17px}.tradeTab{height:34px;border:0;border-radius:6px;background:transparent;color:#8997a7;font-size:10px;font-weight:850}.tradeTab.active.buy{background:#18372c;color:#7ee9bb}.tradeTab.active.sell{background:#3b2028;color:#ff919d}.orderStock{display:flex;align-items:center;gap:10px;margin-bottom:17px}.orderStock .stockMini{height:38px;width:38px}.orderStock strong{font-size:12px}.orderStock small{display:block;color:var(--muted);margin-top:4px;font-size:9px}.orderPrice{margin-left:auto;text-align:right;font:12px 'DM Mono',monospace}.qtyControl{display:flex;align-items:center;gap:8px;margin:8px 0 15px}.qtyControl button{height:35px;width:37px;border:1px solid var(--line2);background:#ffffff05;border-radius:8px;font-size:16px;color:#bcc7d3}.qtyControl input{height:39px;min-width:0;flex:1;text-align:center;border-radius:8px;border:1px solid var(--line2);background:#0a0e14;color:#fff;font:13px 'DM Mono',monospace}.orderBreakdown{border-top:1px solid var(--line);margin-top:14px;padding-top:13px;display:grid;gap:9px}.orderLine{display:flex;justify-content:space-between;gap:10px;color:#9aa8b8;font-size:10px}.orderLine strong{color:#e6edf5;font:10px 'DM Mono',monospace}.tradeWarning{font-size:9px;line-height:1.7;color:#718094;margin:12px 0}.tradeSubmit{width:100%;height:42px}
+@media(max-width:1180px){.sidebar{width:198px}#appMain{margin-left:198px}.content{padding:21px 18px 33px}.topbar{padding:0 18px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.chartLayout{grid-template-columns:minmax(0,1.35fr) minmax(235px,.8fr)}.chartCanvasWrap{height:225px}.lowerGrid{grid-template-columns:1fr}.portfolioHero{grid-template-columns:1fr 1fr}}
+@media(max-width:850px){#authScreen{grid-template-columns:1fr}.authVisual{display:none}.authRight{min-height:100dvh;padding:26px 20px}.sidebar{width:66px;padding:16px 7px}.sidebar .logo{justify-content:center;padding:0 0 23px}.logoText,.workspace,.navBtn .navText,.navBtn .navHint,.simCard,.profileText,#logoutBtn{display:none}.navBtn{justify-content:center;padding:11px 4px}.navBtn .icon{width:19px;height:19px}.profileRow{justify-content:center;padding:12px 0 0}.profileRow .avatar{width:30px;height:30px}#appMain{margin-left:66px}.topbar{height:61px;padding:0 12px;gap:9px}.breadcrumb{display:none}.searchBox{width:min(300px,47vw)}.marketState{display:none}.content{padding:19px 12px 30px}.chartLayout{grid-template-columns:1fr}.watchPanel{display:none}.lowerGrid{grid-template-columns:1fr}.learnGrid{grid-template-columns:1fr 1fr}.settingsGrid{grid-template-columns:1fr}.introActions .demoLabel{display:none}}
+@media(max-width:540px){.topbar{padding:0 8px}.topActions{gap:5px}.topIcon{display:none}.searchBox{width:auto;flex:1}.searchShortcut{display:none}.content{padding:15px 8px 26px}.pageIntro{align-items:flex-start;flex-direction:column;margin-bottom:16px}.pageIntro h1{font-size:23px}.introActions{width:100%;justify-content:space-between}.metrics{gap:8px}.metric{padding:12px 10px}.metricValue{font-size:18px}.metricLabel{font-size:9px}.metricFoot{font-size:8px}.miniSpark{width:38px}.chartTop{padding:14px 12px 9px;flex-direction:column}.chartPrice{font-size:22px;margin-top:11px}.chartTools{width:100%;justify-content:space-between}.chartCanvasWrap{height:210px;padding:0 4px 4px}.chartBottom{padding:9px 12px;font-size:8px}.panelHeader{padding:12px}.dataTable th,.dataTable td{padding:10px 10px}.learnGrid{grid-template-columns:1fr}.kpiGrid{grid-template-columns:1fr 1fr}.portfolioHero{grid-template-columns:1fr}.authWelcome h2{font-size:24px}.searchInline{min-width:120px;flex:1}}
 </style>
 </head>
 <body>
-<canvas id="world" aria-hidden="true"></canvas><div id="ambient"></div>
-<div id="loading"><div class="loadbox"><div class="loadlogo">NETSCARY / XO CLUB</div><div style="color:#797b88;font-size:10px;letter-spacing:.14em;margin-top:8px">ĐANG KHỞI TẠO KHÔNG GIAN 3D</div><div class="loadbar"><i></i></div></div></div>
-<div id="brand"><div class="brandmark">X<span style="color:var(--o-color)">O</span></div><div><div class="brandname">NETSCARY</div><div class="brandtag">XO CLUB · THE NIGHT SHIFT</div></div></div>
-<div id="sceneStatus"><span class="pulse"></span><span id="statusText">3D SCENE ONLINE</span></div>
-<div id="layout"><main id="leftPanel">
-  <section class="view active" id="authView">
-    <div class="eyebrow">01 / ACCESS TERMINAL</div>
-    <h1>VÀO TRẬN.<br><span class="accent">GIỮ BẢN LĨNH.</span></h1>
-    <p class="lede">Một ván cờ nhỏ. Một đối thủ khó đoán. Đăng nhập để mở khu vực chơi và tuỳ chỉnh dấu X / O theo phong cách của bạn.</p>
-    <div class="tagrow"><span class="tag">XO CLASSIC</span><span class="tag">3D AMBIENCE</span><span class="tag">YOUR COLORS</span></div>
-    <div class="tabs"><button class="tab active" type="button" id="loginTab" data-aim="login">ĐĂNG NHẬP</button><button class="tab" type="button" id="registerTab" data-aim="register">ĐĂNG KÝ</button></div>
-    <form id="authForm">
-      <label class="field"><span>Tên tài khoản</span><input id="username" name="username" autocomplete="username" minlength="3" maxlength="24" placeholder="Ví dụ: phucxo" required></label>
-      <label class="field"><span>Mật khẩu</span><input id="password" name="password" type="password" autocomplete="current-password" minlength="6" maxlength="72" placeholder="Ít nhất 6 ký tự" required></label>
-      <label class="field" id="confirmField" style="display:none"><span>Nhập lại mật khẩu</span><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" maxlength="72" placeholder="Nhập lại mật khẩu"></label>
-      <button class="primary fullButton" type="submit" id="authSubmit">ĐĂNG NHẬP VÀO GAME <span aria-hidden="true">↗</span></button>
-    </form>
-    <div id="authMessage" role="status"></div>
-    <p class="smallNote">Bản demo hiện lưu tài khoản trên trình duyệt này, chưa đồng bộ giữa các thiết bị. Không dùng mật khẩu quan trọng của bạn ở đây.</p>
-  </section>
-  <section class="view" id="menuView">
-    <div class="eyebrow">02 / MAIN MENU</div>
-    <h1>CHỌN CÁCH<br><span class="accent">BƯỚC VÀO.</span></h1>
-    <p class="lede">Chào mừng trở lại. Đêm nay, bàn cờ thuộc về bạn.</p>
-    <div class="userBadge"><span class="userDot"></span><span>ĐÃ ĐĂNG NHẬP:</span><strong id="userLabel">PLAYER</strong></div>
-    <div class="menuButtons">
-      <button class="menuButton" type="button" data-action="play" data-aim="play"><span class="num">01</span><span class="mtext"><strong>PLAY / CHƠI GAME</strong><small>Vào bàn cờ và bắt đầu ván mới</small></span><span class="arrow">↗</span></button>
-      <button class="menuButton" type="button" data-action="settings" data-aim="settings"><span class="num">02</span><span class="mtext"><strong>SETTINGS / CÀI ĐẶT</strong><small>Màu X, màu O và giao diện</small></span><span class="arrow">↗</span></button>
-      <button class="menuButton" type="button" data-action="exit" data-aim="exit"><span class="num">03</span><span class="mtext"><strong>EXIT / THOÁT</strong><small>Rời phiên chơi hiện tại</small></span><span class="arrow">↗</span></button>
+<section id="authScreen">
+ <div class="authVisual">
+  <div class="logo"><div class="logoMark">M</div><div class="logoText">MARKET LAB<small>PAPER TRADING TERMINAL</small></div></div>
+  <div class="authHero">
+   <div class="eyebrow"><span class="liveDot"></span> SIMULATED MARKETS · ZERO RISK</div>
+   <h1>Learn the market.<br><span>Master your moves.</span></h1>
+   <p>Practice trading in a professional market workspace. Build a portfolio, study price action and test a strategy — all with virtual capital, never real money.</p>
+   <div class="authStats"><div class="authStat"><strong>$100,000</strong><span>STARTING VIRTUAL CASH</span></div><div class="authStat"><strong>09</strong><span>SIMULATED ASSETS</span></div><div class="authStat"><strong>0.00%</strong><span>REAL-WORLD EXPOSURE</span></div></div>
+   <canvas class="visualChart" id="authChart"></canvas>
+  </div>
+  <div class="authFoot"><span>MARKET LAB / PAPER TRADING</span><span>EDUCATION MODE ONLY</span></div>
+ </div>
+ <div class="authRight"><div class="authBox">
+  <div class="authWelcome"><div class="authPill"><span class="liveDot"></span> YOUR PRIVATE PRACTICE SPACE</div><h2 id="authTitle">Welcome back</h2><p id="authSubtitle">Sign in to continue to your paper trading dashboard.</p></div>
+  <div class="authTabs"><button class="authTab active" id="signInTab" type="button">Sign in</button><button class="authTab" id="signUpTab" type="button">Create account</button></div>
+  <form id="authForm">
+   <label class="field hidden" id="displayNameField"><span class="fieldLabel">Display name</span><input id="displayName" autocomplete="name" maxlength="40" placeholder="Your name"></label>
+   <label class="field"><span class="fieldLabel">Username</span><input id="authUsername" autocomplete="username" minlength="3" maxlength="24" placeholder="e.g. marketlearner" required></label>
+   <label class="field"><span class="fieldLabel">Password</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" maxlength="72" placeholder="At least 6 characters" required></label>
+   <label class="field hidden" id="confirmField"><span class="fieldLabel">Confirm password</span><input id="authConfirm" type="password" autocomplete="new-password" minlength="6" maxlength="72" placeholder="Re-enter password"></label>
+   <button class="btn primary authSubmit" id="authSubmit" type="submit">Sign in to Market Lab <span>↗</span></button>
+  </form>
+  <div class="authFeedback" id="authFeedback" role="status"></div>
+  <div class="finePrint">Educational simulator only. Quotes and returns are generated locally for practice and do not represent live market data. Accounts and portfolios are stored in this browser on this device; this is a demo, not a production authentication service.</div>
+ </div></div>
+</section>
+<div id="appShell" class="hidden">
+ <aside class="sidebar">
+  <div class="logo"><div class="logoMark">M</div><div class="logoText">MARKET LAB<small>PAPER TRADING</small></div></div>
+  <div class="workspace">Workspace</div>
+  <nav class="navList" aria-label="Main navigation">
+   <button class="navBtn active" data-page="overview" title="Overview"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/></svg><span class="navText">Overview</span><span class="navHint">01</span></button>
+   <button class="navBtn" data-page="markets" title="Markets"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><path d="m7 15 4-5 3 2 5-7"/></svg><span class="navText">Markets</span><span class="navHint">02</span></button>
+   <button class="navBtn" data-page="portfolio" title="Portfolio"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="15" rx="2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></svg><span class="navText">Portfolio</span><span class="navHint">03</span></button>
+   <button class="navBtn" data-page="activity" title="Activity"><svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="18" cy="19" r="2"/></svg><span class="navText">Activity</span><span class="navHint">04</span></button>
+  </nav>
+  <div class="workspace">Resources</div>
+  <nav class="navList">
+   <button class="navBtn" data-page="learn" title="Learn"><svg class="icon" viewBox="0 0 24 24"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H12v18H5.5A2.5 2.5 0 0 0 3 23z" transform="translate(0 -1)"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H12v18h6.5A2.5 2.5 0 0 1 21 23z" transform="translate(0 -1)"/></svg><span class="navText">Learn</span></button>
+   <button class="navBtn" data-page="settings" title="Settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19 14 2 2-2 3-3-1-2 2h-3l-1-3-3-1-1-3 2-2-1-3 3-1 2 2 3-1 2 2 3 1z"/></svg><span class="navText">Settings</span></button>
+  </nav>
+  <div class="sidebarSpacer"></div>
+  <div class="simCard"><div class="simTag">◉ SIMULATOR ACTIVE</div><p>All orders use virtual funds. No real-world market connection.</p></div>
+  <div class="profileRow"><div class="avatar" id="sideAvatar">M</div><div class="profileText"><div class="profileName" id="sideName">Market Learner</div><div class="profileType">Paper trader</div></div><button id="logoutBtn" title="Sign out" aria-label="Sign out"><svg class="icon" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg></button></div>
+ </aside>
+ <main id="appMain">
+  <header class="topbar">
+   <div class="breadcrumb">Market Lab <span style="color:#465365">/</span> <strong id="crumbTitle">Overview</strong></div>
+   <div class="searchBox"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="globalSearch" placeholder="Search ticker, e.g. NVDA" aria-label="Search ticker"><span class="searchShortcut">/</span></div>
+   <div class="topActions"><div class="marketState"><span class="liveDot"></span><span>SIMULATED MARKET</span></div><button class="topIcon" id="helpBtn" title="Simulator information"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1 .9-1.8 1.2-1.8 2.7M12 17h.01"/></svg></button><button class="topAvatar" id="topAvatar" title="Account settings">M</button></div>
+  </header>
+  <div class="content">
+   <section class="page active" id="page-overview">
+    <div class="pageIntro"><div><div class="eyebrow">PAPER ACCOUNT · SIMULATED MARKET</div><h1 id="welcomeTitle">Good evening.</h1><p>A clear view of your simulated portfolio and market moves.</p></div><div class="introActions"><span class="demoLabel"><span class="liveDot"></span> DEMO DATA ONLY</span><button class="btn primary" id="quickBuy">＋ New trade</button></div></div>
+    <div class="metrics">
+     <article class="metric"><div class="metricTop"><span class="metricLabel">Total equity</span><span class="metricIcon"><svg class="icon" viewBox="0 0 24 24"><path d="M3 17l6-6 4 3 8-9"/><path d="M15 5h6v6"/></svg></span></div><div class="metricValue num" id="totalEquity">$100,000.00</div><div class="metricFoot"><span class="delta" id="equityDelta">+$0.00</span><span>since start</span><canvas class="miniSpark" id="sparkEquity"></canvas></div></article>
+     <article class="metric"><div class="metricTop"><span class="metricLabel">Available cash</span><span class="metricIcon"><svg class="icon" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 9h19M16 14h2"/></svg></span></div><div class="metricValue num" id="cashBalance">$100,000.00</div><div class="metricFoot"><span class="muted">Ready to deploy</span><canvas class="miniSpark" id="sparkCash"></canvas></div></article>
+     <article class="metric"><div class="metricTop"><span class="metricLabel">Invested value</span><span class="metricIcon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5M4 19h17"/><rect x="7" y="12" width="3" height="4" rx=".5"/><rect x="13" y="8" width="3" height="8" rx=".5"/><rect x="19" y="4" width="2" height="12" rx=".5"/></svg></span></div><div class="metricValue num" id="investedValue">$0.00</div><div class="metricFoot"><span id="positionsCount">0 open positions</span><canvas class="miniSpark" id="sparkInvested"></canvas></div></article>
+     <article class="metric"><div class="metricTop"><span class="metricLabel">Unrealized P/L</span><span class="metricIcon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 17 9 12l4 3 7-9"/><path d="M14 6h6v6"/></svg></span></div><div class="metricValue num" id="unrealizedValue">$0.00</div><div class="metricFoot"><span id="unrealizedPct">0.00%</span><span>open positions</span><canvas class="miniSpark" id="sparkPL"></canvas></div></article>
     </div>
-    <div class="footerLine"><span>PLAYER LOBBY</span><button class="backBtn" id="logoutBtn" type="button" data-aim="logout">ĐĂNG XUẤT ↗</button></div>
-  </section>
-  <section class="view" id="settingsView">
-    <div class="eyebrow">03 / PERSONALISE</div>
-    <div class="viewHeading"><h2>Cài đặt</h2><button class="backBtn" data-action="menu" type="button" data-aim="back">← MENU</button></div>
-    <p class="lede">Chọn màu của dấu X, dấu O và bàn cờ. Thay đổi được lưu trên trình duyệt này.</p>
-    <div class="settingRow"><div class="settingLabel"><strong>Màu dấu X</strong><small>Viền thắng và dấu X của bạn</small></div><input type="color" id="xColor" value="#58e4ff" aria-label="Màu dấu X"></div>
-    <div class="settingRow"><div class="settingLabel"><strong>Màu dấu O</strong><small>Màu đối thủ và dấu O</small></div><input type="color" id="oColor" value="#ff668c" aria-label="Màu dấu O"></div>
-    <div class="settingRow"><div class="settingLabel"><strong>Nền ô cờ</strong><small>Màu nền của 9 ô</small></div><input type="color" id="boardColor" value="#111923" aria-label="Màu nền ô cờ"></div>
-    <div class="settingRow"><div class="settingLabel"><strong>Ánh sáng 3D</strong><small>Độ sáng không gian phía sau</small></div><input type="range" id="brightness" min="40" max="140" value="100" aria-label="Độ sáng 3D"></div>
-    <div class="settingRow"><div class="settingLabel"><strong>Độ khó máy</strong><small>Đối thủ khi chơi một mình</small></div><select id="difficulty" class="modePick"><option value="normal">Bình thường</option><option value="hard">Khó</option></select></div>
-    <div class="settingsFooter"><button class="secondary" id="resetSettings" type="button" data-aim="reset">MẶC ĐỊNH</button><button class="primary" id="saveSettings" type="button" data-aim="save">LƯU CÀI ĐẶT</button></div>
-  </section>
-  <section class="view" id="gameView">
-    <div class="eyebrow">04 / THE BOARD</div>
-    <div class="viewHeading"><h2>Bàn cờ XO</h2><button class="backBtn" data-action="menu" type="button" data-aim="backgame">← MENU</button></div>
-    <p class="lede">Tạo một hàng ba dấu trước đối thủ. Chọn kiểu chơi bên dưới.</p>
-    <div class="gameInfo"><div class="turnBadge">LƯỢT: <span id="turnMark">X</span></div><select id="gameMode" class="modePick" aria-label="Chế độ chơi"><option value="ai">Đấu với máy</option><option value="local">Hai người cùng máy</option></select></div>
-    <div id="board" role="group" aria-label="Bàn cờ tic tac toe">
-      <button class="cell" data-cell="0" aria-label="Ô 1"></button><button class="cell" data-cell="1" aria-label="Ô 2"></button><button class="cell" data-cell="2" aria-label="Ô 3"></button>
-      <button class="cell" data-cell="3" aria-label="Ô 4"></button><button class="cell" data-cell="4" aria-label="Ô 5"></button><button class="cell" data-cell="5" aria-label="Ô 6"></button>
-      <button class="cell" data-cell="6" aria-label="Ô 7"></button><button class="cell" data-cell="7" aria-label="Ô 8"></button><button class="cell" data-cell="8" aria-label="Ô 9"></button>
+    <div class="chartLayout">
+     <section class="panel">
+      <div class="chartTop"><div style="min-width:0"><div class="assetHeadline"><div class="assetLogo" id="chartLogo">NV</div><div style="min-width:0"><div class="assetName" id="chartCompany">NVIDIA Corporation</div><div class="assetCompany" id="chartMeta">NASDAQ · NVDA · Simulated quote</div></div></div><div class="chartPrice num" id="chartPrice">$183.64</div><div class="chartChange positive" id="chartChange">+0.00% today</div></div><div class="chartTools"><div><button class="toolButton active" data-range="1D">1D</button><button class="toolButton" data-range="1W">1W</button><button class="toolButton" data-range="1M">1M</button><button class="toolButton" data-range="1Y">1Y</button></div><div class="chartType"><button class="toolButton active" data-chart="line">Line</button><button class="toolButton" data-chart="candle">Candle</button></div></div></div>
+      <div class="chartCanvasWrap"><canvas class="chartCanvas" id="priceChart" aria-label="Simulated stock chart"></canvas></div>
+      <div class="chartLegend"><span class="legendDot"></span><span id="chartLegendLabel">NVDA simulated price</span><span>·</span><span>Illustrative data</span></div>
+      <div class="chartBottom"><span>Instrument <strong id="bottomTicker">NVDA</strong></span><span>Updated <strong id="lastUpdate">Just now</strong></span><button class="seeAll" id="chartTradeBtn">Trade this asset ↗</button></div>
+     </section>
+     <section class="panel watchPanel">
+      <div class="panelHeader"><div><div class="panelTitle">Watchlist</div><div class="panelSub">Selected instruments to follow</div></div><button class="seeAll" data-go="markets">View all ↗</button></div>
+      <div class="watchlistRows" id="watchlistRows"></div>
+      <div class="panelHeader" style="border-top:1px solid #ffffff0b;border-bottom:0"><div><div class="panelTitle">Market pulse</div><div class="panelSub">Largest simulated moves</div></div></div>
+      <div class="watchlistRows" id="moversRows"></div>
+     </section>
     </div>
-    <div id="gameMessage" role="status">Bạn là X. Hãy chọn một ô để đi nước đầu tiên.</div>
-    <div class="gameActions"><button class="secondary" id="restartGame" type="button" data-aim="restart">CHƠI LẠI</button><button class="primary" id="gameSettings" type="button" data-action="settings" data-aim="gameSettings">CÀI ĐẶT</button></div>
-  </section>
-  <section class="view" id="exitView">
-    <div class="eyebrow">05 / SESSION END</div>
-    <h1>HẸN GẶP<br><span class="accent">LẦN SAU.</span></h1>
-    <p class="lede">Đèn pin đang chiếu thẳng về phía màn hình. Bạn có thể quay lại sảnh hoặc đăng xuất khỏi phiên hiện tại.</p>
-    <div class="exitCard"><strong id="exitGreeting">Mọi thứ đã sẵn sàng.</strong><p>Trang web không tự đóng được tab trình duyệt. Hãy chọn quay lại sảnh hoặc đăng xuất.</p></div>
-    <div class="settingsFooter"><button class="secondary" id="returnMenu" type="button" data-action="menu" data-aim="backexit">QUAY LẠI</button><button class="primary" id="exitLogout" type="button" data-aim="logoutExit">ĐĂNG XUẤT</button></div>
-  </section>
-  <div class="footerLine"><span>NETSCARY XO CLUB</span><span>BUILT FOR THE NIGHT</span></div>
-</main></div>
-<div id="sceneError" role="status"></div>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <div class="lowerGrid">
+     <section class="panel"><div class="panelHeader"><div><div class="panelTitle">Your positions</div><div class="panelSub">Current holdings and market value</div></div><button class="seeAll" data-go="portfolio">Portfolio ↗</button></div><div class="tableWrap"><table class="dataTable"><thead><tr><th>Asset</th><th>Shares</th><th>Last price</th><th>Market value</th><th>P/L</th><th></th></tr></thead><tbody id="positionPreview"></tbody></table></div></section>
+     <section class="panel"><div class="panelHeader"><div><div class="panelTitle">Recent activity</div><div class="panelSub">Your latest paper orders</div></div><button class="seeAll" data-go="activity">All activity ↗</button></div><div id="recentActivity"></div></section>
+    </div>
+   </section>
+   <section class="page" id="page-markets"><div class="pageIntro"><div><div class="eyebrow">EXPLORE INSTRUMENTS</div><h1>Markets</h1><p>Browse the simulator's universe and select an asset to inspect or trade.</p></div><span class="demoLabel"><span class="liveDot"></span> PRICES ARE SIMULATED</span></div>
+    <section class="panel"><div class="panelHeader"><div><div class="panelTitle">Market universe</div><div class="panelSub" id="marketCount">09 instruments available</div></div><div class="filterRow"><input class="searchInline" id="marketSearch" placeholder="Filter ticker or company"><select class="filterSelect" id="marketSort"><option value="symbol">Ticker A–Z</option><option value="change">Biggest move</option><option value="price">Price high to low</option></select></div></div><div class="tableWrap"><table class="dataTable marketTable"><thead><tr><th>Instrument</th><th>Last price</th><th>Day change</th><th>Sim. volume</th><th></th></tr></thead><tbody id="marketRows"></tbody></table></div></section>
+   </section>
+   <section class="page" id="page-portfolio"><div class="pageIntro"><div><div class="eyebrow">CAPITAL ALLOCATION</div><h1>Portfolio</h1><p>Track exposure and manage positions with virtual cash.</p></div><button class="btn primary" id="portfolioBuy">＋ New trade</button></div>
+    <div class="portfolioHero"><div class="balanceLarge"><div class="eyebrow" style="color:#94b8a5">TOTAL PORTFOLIO EQUITY</div><div class="big num" id="portfolioEquity">$100,000.00</div><p id="portfolioSummary">Your starting balance is virtual capital for educational use.</p><div style="display:flex;gap:8px;margin-top:17px"><button class="btn buy small" id="portfolioBuy2">Buy assets</button><button class="btn small" id="portfolioSell">Sell assets</button></div></div><div class="panel allocation"><div class="panelTitle">Asset allocation</div><div class="panelSub">Portfolio value by holding</div><canvas class="allocationCanvas" id="allocationChart"></canvas><div class="legendList" id="allocationLegend"></div></div></div>
+    <div class="kpiGrid"><div class="kpi"><span>Available cash</span><strong id="portfolioCash">$100,000.00</strong></div><div class="kpi"><span>Market value</span><strong id="portfolioInvested">$0.00</strong></div><div class="kpi"><span>Unrealized return</span><strong id="portfolioPL">$0.00</strong></div></div>
+    <section class="panel sectionGap"><div class="panelHeader"><div><div class="panelTitle">Holdings</div><div class="panelSub">Quantity, average cost and performance</div></div></div><div class="tableWrap"><table class="dataTable"><thead><tr><th>Asset</th><th>Shares</th><th>Avg. cost</th><th>Last price</th><th>Market value</th><th>Unrealized P/L</th><th></th></tr></thead><tbody id="portfolioRows"></tbody></table></div></section>
+   </section>
+   <section class="page" id="page-activity"><div class="pageIntro"><div><div class="eyebrow">ORDER JOURNAL</div><h1>Activity</h1><p>Review your simulated executions and cash movements.</p></div><button class="btn" id="exportActivity">Export CSV ↓</button></div><section class="panel"><div class="panelHeader"><div><div class="panelTitle">Transaction history</div><div class="panelSub">Most recent orders appear first</div></div><div class="filterRow"><select class="filterSelect" id="activityFilter"><option value="all">All transactions</option><option value="BUY">Buys</option><option value="SELL">Sells</option></select></div></div><div class="tableWrap"><table class="dataTable"><thead><tr><th>Time</th><th>Side</th><th>Asset</th><th>Shares</th><th>Fill price</th><th>Gross amount</th><th>Fee</th></tr></thead><tbody id="activityRows"></tbody></table></div></section></section>
+   <section class="page" id="page-learn"><div class="pageIntro"><div><div class="eyebrow">INVESTING FOUNDATIONS</div><h1>Learn the basics</h1><p>Use this sandbox to understand orders, risk and how portfolios behave.</p></div></div><div class="learnGrid">
+    <article class="learnCard"><span class="learnNum">LESSON / 01</span><h3>Market orders</h3><p>A market buy uses your virtual cash to purchase shares at the simulator's current quote. A sell converts some of your holdings back into cash. This practice engine does not route orders to an exchange.</p></article>
+    <article class="learnCard"><span class="learnNum">LESSON / 02</span><h3>Unrealized profit & loss</h3><p>Unrealized P/L compares the current market value of open holdings with their cost basis. It can change as the simulated quote moves, and it becomes realized when shares are sold.</p></article>
+    <article class="learnCard"><span class="learnNum">LESSON / 03</span><h3>Diversification</h3><p>Holding different assets can reduce reliance on one company, but it does not remove risk. Watch allocation and avoid putting all virtual capital into one position just to chase a short-term move.</p></article>
+    <article class="learnCard"><span class="learnNum">LESSON / 04</span><h3>Candlestick charts</h3><p>A candle summarizes open, high, low and close. Green candles close above their open; red candles close below. A candle is a compact view of a chosen time interval, not a prediction.</p></article>
+    <article class="learnCard"><span class="learnNum">LESSON / 05</span><h3>Position sizing</h3><p>Before placing an order, check the order estimate, remaining cash and the amount of the portfolio that the position would represent. Small practice trades make it easier to learn from mistakes.</p></article>
+    <article class="learnCard"><span class="learnNum">LESSON / 06</span><h3>Keep a trade journal</h3><p>Use Activity to review each simulated order. Write down why you entered, what would invalidate your idea and what you learned. A process matters more than one lucky outcome.</p></article>
+   </div><div class="tipBox"><strong>Important:</strong> This application is an educational paper-trading simulator. The assets and prices are illustrative and generated locally; they are not real-time exchange quotes or investment recommendations. Trading real financial products involves risk.</div></section>
+   <section class="page" id="page-settings"><div class="pageIntro"><div><div class="eyebrow">PREFERENCES & ACCOUNT</div><h1>Settings</h1><p>Personalize your simulator workspace.</p></div><button class="btn primary" id="savePreferences">Save preferences</button></div><div class="settingsGrid">
+    <section class="panel settingPanel"><h3>Trading preferences</h3><div class="settingsLine"><div><strong>Display currency</strong><small>Changes display formatting only; it does not convert holdings.</small></div><select id="currencySelect"><option value="USD">USD · US Dollar</option><option value="VND">VND · Vietnamese đồng</option></select></div><div class="settingsLine"><div><strong>Commission rate</strong><small>Applied to each simulated buy or sell.</small></div><select id="feeSelect"><option value="0">0.00%</option><option value="0.001" selected>0.10%</option><option value="0.0025">0.25%</option></select></div><div class="settingsLine"><div><strong>Simulated quote updates</strong><small>Prices move locally while this tab is open.</small></div><input id="autoRefresh" type="checkbox" checked></div><div class="settingsLine"><div><strong>Compact tables</strong><small>Use denser rows on portfolio and market pages.</small></div><input id="compactTables" type="checkbox"></div></section>
+    <section class="panel settingPanel"><h3>Account & data</h3><div class="settingsLine"><div><strong>Signed in as</strong><small id="settingsAccountName">Market learner</small></div><button class="btn small" id="settingsLogout">Sign out</button></div><div class="settingsLine"><div><strong>Starting virtual capital</strong><small>Reset your simulated cash, holdings and order history.</small></div><button class="btn small" id="resetAccount">Reset account</button></div><div class="settingsLine"><div><strong>Export portfolio data</strong><small>Download your paper-trading state for your own records.</small></div><button class="btn small" id="exportPortfolio">Export JSON ↓</button></div><div class="tipBox">Your account and state are saved only in local browser storage for this prototype. Clearing site data removes local accounts. There is no cloud sync or server-side authentication.</div></section>
+   </div></section>
+  </div>
+ </main>
+</div>
+<div id="tradeModal" role="dialog" aria-modal="true" aria-labelledby="tradeTitle"><div class="tradeBox"><div class="tradeHeader"><div><div class="eyebrow">PAPER ORDER TICKET</div><h2 id="tradeTitle">Place an order</h2></div><button class="closeBtn" id="closeTrade" aria-label="Close order ticket">✕</button></div><div class="tradeBody"><div class="tradeTabs"><button class="tradeTab active buy" id="buyTab" type="button">BUY</button><button class="tradeTab sell" id="sellTab" type="button">SELL</button></div><div class="orderStock"><div class="stockMini" id="tradeLogo">NV</div><div><strong id="tradeName">NVIDIA Corporation</strong><small id="tradeSymbol">NVDA · Simulated quote</small></div><div class="orderPrice"><div id="tradePrice">$183.64</div><small class="muted">per share</small></div></div><label class="field"><span class="fieldLabel">Instrument</span><select id="tradeSymbolSelect"></select></label><div class="fieldLabel" style="margin-top:14px">Quantity (whole shares)<span class="muted" id="sharesAvailable"></span></div><div class="qtyControl"><button type="button" id="qtyMinus" aria-label="Decrease quantity">−</button><input id="tradeQty" type="number" min="1" max="1000000" step="1" value="1" inputmode="numeric"><button type="button" id="qtyPlus" aria-label="Increase quantity">＋</button></div><div class="orderBreakdown"><div class="orderLine"><span>Estimated order value</span><strong id="orderSubtotal">$183.64</strong></div><div class="orderLine"><span>Simulated commission</span><strong id="orderFee">$0.18</strong></div><div class="orderLine"><span id="orderTotalLabel">Estimated cash required</span><strong id="orderTotal">$183.82</strong></div><div class="orderLine"><span>Available cash</span><strong id="orderCash">$100,000.00</strong></div></div><div class="tradeWarning">Paper trading only. Orders execute immediately at the current simulated price; no real funds or exchange are involved.</div><div class="authFeedback" id="tradeFeedback" role="status"></div><button class="btn primary tradeSubmit" id="submitTrade">Confirm simulated buy</button></div></div></div>
+<div id="toast" role="status" aria-live="polite"></div>
 <script>
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const views=['authView','menuView','settingsView','gameView','exitView'];
-let activeUser='',authMode='login',currentView='authView',board=Array(9).fill(null),turn='X',gameOver=false,winningLine=[],gameMode='ai';
-let aimButton=null,aimExit=false,scene3d=null;
+const STORAGE_USERS='marketlab_users_v1',STORAGE_SESSION='marketlab_session_v1',STORAGE_PREFIX='marketlab_account_v1_',STORAGE_PREFS='marketlab_preferences_v1';
+const INITIAL_CAPITAL=100000, FEE_DEFAULT=.001;
+const baseAssets=[
+ {symbol:'NVDA',name:'NVIDIA Corporation',exchange:'NASDAQ',price:183.64,prev:181.92,color:'#7bc5a4',logo:'NV'},
+ {symbol:'AAPL',name:'Apple Inc.',exchange:'NASDAQ',price:238.12,prev:240.04,color:'#adb6c7',logo:'A'},
+ {symbol:'MSFT',name:'Microsoft Corporation',exchange:'NASDAQ',price:510.36,prev:506.42,color:'#86a9ff',logo:'M'},
+ {symbol:'TSLA',name:'Tesla, Inc.',exchange:'NASDAQ',price:332.48,prev:341.11,color:'#f28c8c',logo:'T'},
+ {symbol:'AMZN',name:'Amazon.com, Inc.',exchange:'NASDAQ',price:224.75,prev:222.16,color:'#d9ac73',logo:'a'},
+ {symbol:'GOOGL',name:'Alphabet Inc.',exchange:'NASDAQ',price:192.63,prev:190.08,color:'#94b8ff',logo:'G'},
+ {symbol:'META',name:'Meta Platforms, Inc.',exchange:'NASDAQ',price:671.54,prev:665.81,color:'#82c5ee',logo:'∞'},
+ {symbol:'AMD',name:'Advanced Micro Devices',exchange:'NASDAQ',price:164.83,prev:167.25,color:'#e9a474',logo:'AMD'},
+ {symbol:'JPM',name:'JPMorgan Chase & Co.',exchange:'NYSE',price:297.61,prev:296.14,color:'#a4b2be',logo:'JPM'}
+];
+let assets=[], activeUser='', authMode='login', account=null, prefs={currency:'USD',fee:FEE_DEFAULT,autoRefresh:true,compact:false}, selectedSymbol='NVDA', chartRange='1D', chartKind='line', tradeSide='BUY', tradeSymbol='NVDA', quoteTimer=null, toastTimer=null, resizeTimer=null;
+const chartColors=['#7bc5a4','#86a9ff','#e5c58b','#f28c8c','#82c5ee','#c49cff','#f3b878','#6ad3cb','#f196b3'];
 
-const defaultSettings={xColor:'#58e4ff',oColor:'#ff668c',boardColor:'#111923',brightness:100,difficulty:'normal'};
-let settings={...defaultSettings};
-try{settings={...defaultSettings,...JSON.parse(localStorage.getItem('netscary_settings_v2')||'{}')};}catch(e){}
-function applySettings(){
- document.documentElement.style.setProperty('--x-color',settings.xColor);
- document.documentElement.style.setProperty('--o-color',settings.oColor);
- document.documentElement.style.setProperty('--board-color',settings.boardColor);
- document.documentElement.style.setProperty('--glow-color',settings.oColor);
- $('xColor').value=settings.xColor;$('oColor').value=settings.oColor;$('boardColor').value=settings.boardColor;
- $('brightness').value=settings.brightness;$('difficulty').value=settings.difficulty||'normal';
- if(scene3d&&scene3d.ambient){scene3d.ambient.intensity=1.8*(settings.brightness/100);scene3d.fill.intensity=1.15*(settings.brightness/100);}
- renderBoard();
+function clone(v){return JSON.parse(JSON.stringify(v));}
+function money(n){n=Number(n)||0;const code=prefs.currency||'USD';if(code==='VND')return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND',maximumFractionDigits:0}).format(n*25000);return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2,maximumFractionDigits:2}).format(n);}
+function moneyShort(n){n=Number(n)||0;const v=prefs.currency==='VND'?n*25000:n;const symbol=prefs.currency==='VND'?'₫':'$';if(Math.abs(v)>=1e9)return symbol+(v/1e9).toFixed(2)+'B';if(Math.abs(v)>=1e6)return symbol+(v/1e6).toFixed(2)+'M';if(Math.abs(v)>=1e3)return symbol+(v/1e3).toFixed(1)+'K';return symbol+v.toFixed(prefs.currency==='VND'?0:2);}
+function pct(n){return (n>0?'+':'')+n.toFixed(2)+'%';}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+function symbolAsset(symbol){return assets.find(a=>a.symbol===symbol)||assets[0];}
+function randomBetween(a,b){return a+Math.random()*(b-a);}
+function seedHistory(price,prev,points){
+ let p=price*(1+randomBetween(-.035,.015)),rows=[];
+ for(let i=0;i<points;i++){const open=p,change=randomBetween(-.012,.012);const close=Math.max(.1,open*(1+change));const wiggle=open*Math.random()*.007;rows.push({open,close,high:Math.max(open,close)+wiggle,low:Math.max(.01,Math.min(open,close)-wiggle),volume:Math.floor(randomBetween(1e5,4e6))});p=close;}
+ const ratio=price/rows[rows.length-1].close;return rows.map(r=>({open:r.open*ratio,close:r.close*ratio,high:r.high*ratio,low:r.low*ratio,volume:r.volume}));
 }
-function setView(id){
- currentView=id;
- views.forEach(v=>$(v).classList.toggle('active',v===id));
- aimExit=id==='exitView';
- if(id==='exitView')setAim(null,true);
- else if(id==='menuView')setAim($('menuView').querySelector('[data-aim="play"]'),false);
- else if(id==='authView')setAim($('loginTab'),false);
- else if(id==='settingsView')setAim($('saveSettings'),false);
- else if(id==='gameView')setAim($('board').querySelector('[data-cell="4"]'),false);
-}
-function setMessage(t,color){$('authMessage').textContent=t;$('authMessage').style.color=color||'#efc98b';}
-function setAuthMode(mode){
- authMode=mode;
- const isRegister=mode==='register';
- $('loginTab').classList.toggle('active',!isRegister);$('registerTab').classList.toggle('active',isRegister);
- $('confirmField').style.display=isRegister?'block':'none';
- $('confirmPassword').required=isRegister;
- $('authSubmit').textContent=isRegister?'TẠO TÀI KHOẢN ↗':'ĐĂNG NHẬP VÀO GAME ↗';
- $('password').autocomplete=isRegister?'new-password':'current-password';
- setMessage('');
- setAim($(isRegister?'registerTab':'loginTab'),false);
-}
-function users(){try{return JSON.parse(localStorage.getItem('netscary_users_v2')||'{}');}catch(e){return {};}}
-function saveUsers(u){localStorage.setItem('netscary_users_v2',JSON.stringify(u));}
-function hex(bytes){return Array.from(new Uint8Array(bytes)).map(x=>x.toString(16).padStart(2,'0')).join('');}
-async function passwordHash(password,salt){
- if(!window.crypto||!crypto.subtle)throw new Error('Đăng nhập cần trình duyệt hỗ trợ bảo mật HTTPS.');
- const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+password));
- return hex(bytes);
-}
-function salt(){const a=new Uint8Array(16);crypto.getRandomValues(a);return hex(a);}
-function loginUser(name){activeUser=name;localStorage.setItem('netscary_session_v2',name);$('userLabel').textContent=name;$('exitGreeting').textContent='Tài khoản '+name+' đã sẵn sàng.';setView('menuView');}
-$('loginTab').addEventListener('click',()=>setAuthMode('login'));
-$('registerTab').addEventListener('click',()=>setAuthMode('register'));
+function initAssets(){assets=baseAssets.map((a,i)=>({...a,open:a.prev,price:a.price,history:seedHistory(a.price,a.prev,100),watch:i<6,volume:Math.floor(randomBetween(1.4e6,35e6))}));}
+function users(){try{return JSON.parse(localStorage.getItem(STORAGE_USERS)||'{}');}catch(e){return {};}}
+function saveUsers(u){localStorage.setItem(STORAGE_USERS,JSON.stringify(u));}
+function acctKey(){return STORAGE_PREFIX+activeUser.toLowerCase();}
+function defaultAccount(name){return {displayName:name,createdAt:new Date().toISOString(),cash:INITIAL_CAPITAL,initialCapital:INITIAL_CAPITAL,holdings:{},trades:[],equityHistory:[INITIAL_CAPITAL],lastSaved:Date.now()};}
+function loadAccount(){try{const saved=JSON.parse(localStorage.getItem(acctKey())||'null');account=saved&&typeof saved.cash==='number'?saved:defaultAccount(activeUser);}catch(e){account=defaultAccount(activeUser);}if(!account.holdings)account.holdings={};if(!account.trades)account.trades=[];if(!account.equityHistory)account.equityHistory=[account.cash];}
+function saveAccount(){if(!activeUser||!account)return;account.lastSaved=Date.now();try{localStorage.setItem(acctKey(),JSON.stringify(account));}catch(e){toast('Browser storage is full. Export your portfolio before continuing.');}}
+function setFeedback(t,bad){$('authFeedback').textContent=t;$('authFeedback').style.color=bad?'var(--red)':'var(--gold)';}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3200);}
+function randSalt(){const b=new Uint8Array(16);crypto.getRandomValues(b);return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');}
+function hex(buffer){return Array.from(new Uint8Array(buffer)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+async function hashPassword(password,salt){if(!window.crypto||!crypto.subtle)throw new Error('Secure password hashing needs a modern browser on HTTPS. Open this site through GitHub Pages.');const enc=new TextEncoder(),key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(salt),iterations:120000,hash:'SHA-256'},key,256);return hex(bits);}
+function setAuthMode(mode){authMode=mode;const signup=mode==='signup';$('signInTab').classList.toggle('active',!signup);$('signUpTab').classList.toggle('active',signup);$('displayNameField').classList.toggle('hidden',!signup);$('confirmField').classList.toggle('hidden',!signup);$('authConfirm').required=signup;$('authTitle').textContent=signup?'Create your account':'Welcome back';$('authSubtitle').textContent=signup?'Set up a local practice account to start with virtual capital.':'Sign in to continue to your paper trading dashboard.';$('authSubmit').innerHTML=signup?'Create account <span>↗</span>':'Sign in to Market Lab <span>↗</span>';$('authPassword').autocomplete=signup?'new-password':'current-password';setFeedback('');}
+function showApp(){ $('authScreen').classList.add('hidden');$('appShell').classList.remove('hidden');$('sideName').textContent=account.displayName||activeUser;$('sideAvatar').textContent=(account.displayName||activeUser).trim().charAt(0).toUpperCase();$('topAvatar').textContent=(account.displayName||activeUser).trim().charAt(0).toUpperCase();$('settingsAccountName').textContent=(account.displayName||activeUser)+' (@'+activeUser+')';$('welcomeTitle').textContent='Good to see you, '+(account.displayName||activeUser).split(' ')[0]+'.';initSymbolSelect();renderAll();setPage('overview');}
+function signOut(){if(quoteTimer){clearInterval(quoteTimer);quoteTimer=null;}activeUser='';account=null;localStorage.removeItem(STORAGE_SESSION);$('appShell').classList.add('hidden');$('authScreen').classList.remove('hidden');$('authPassword').value='';setAuthMode('login');}
+$('signInTab').addEventListener('click',()=>setAuthMode('login'));$('signUpTab').addEventListener('click',()=>setAuthMode('signup'));
 $('authForm').addEventListener('submit',async e=>{
- e.preventDefault();
- const name=$('username').value.trim(),password=$('password').value,confirm=$('confirmPassword').value;
- if(!/^[A-Za-z0-9_ -]{3,24}$/.test(name)){setMessage('Tên tài khoản cần 3–24 ký tự, chỉ dùng chữ, số, dấu gạch hoặc khoảng trắng.','#ff8a9b');return;}
- if(password.length<6){setMessage('Mật khẩu cần ít nhất 6 ký tự.','#ff8a9b');return;}
- const submit=$('authSubmit');submit.disabled=true;submit.style.opacity='.6';
+ e.preventDefault();const rawName=$('authUsername').value.trim(),password=$('authPassword').value,confirm=$('authConfirm').value;
+ if(!/^[A-Za-z0-9_]{3,24}$/.test(rawName)){setFeedback('Username must be 3–24 characters (letters, numbers, underscores).',true);return;}
+ if(password.length<6){setFeedback('Password must be at least 6 characters.',true);return;}
+ if(authMode==='signup'&&password!==confirm){setFeedback('The passwords do not match.',true);return;}
+ const btn=$('authSubmit');btn.disabled=true;btn.style.opacity='.6';
  try{
-  const all=users(),key=name.toLowerCase();
-  if(authMode==='register'){
-   if(all[key]){setMessage('Tên tài khoản này đã tồn tại.','#ff8a9b');return;}
-   if(password!==confirm){setMessage('Hai mật khẩu chưa khớp.','#ff8a9b');return;}
-   const s=salt(),h=await passwordHash(password,s);all[key]={name,salt:s,hash:h};saveUsers(all);
-   setAuthMode('login');$('password').value='';$('confirmPassword').value='';setMessage('Tạo tài khoản thành công. Hãy đăng nhập để tiếp tục.','#8be0ad');
+  const all=users(),key=rawName.toLowerCase();
+  if(authMode==='signup'){
+   if(all[key]){setFeedback('That username is already taken on this browser.',true);return;}
+   const salt=randSalt(),hash=await hashPassword(password,salt),display=$('displayName').value.trim()||rawName;
+   all[key]={username:rawName,displayName:display,salt,hash,createdAt:new Date().toISOString()};saveUsers(all);activeUser=key;account=defaultAccount(display);saveAccount();localStorage.setItem(STORAGE_SESSION,key);showApp();toast('Practice account created. You start with '+money(INITIAL_CAPITAL)+' in virtual capital.');
   }else{
-   const user=all[key];if(!user){setMessage('Không tìm thấy tài khoản này trên trình duyệt. Hãy đăng ký trước.','#ff8a9b');return;}
-   const h=await passwordHash(password,user.salt);if(h!==user.hash){setMessage('Mật khẩu chưa đúng.','#ff8a9b');return;}
-   loginUser(user.name);$('password').value='';
+   const user=all[key];if(!user){setFeedback('Account not found on this browser. Create an account first.',true);return;}
+   if(await hashPassword(password,user.salt)!==user.hash){setFeedback('Incorrect username or password.',true);return;}
+   activeUser=key;loadAccount();account.displayName=user.displayName||account.displayName||user.username;saveAccount();localStorage.setItem(STORAGE_SESSION,key);showApp();toast('Signed in. Your paper portfolio has been restored.');
   }
- }catch(err){setMessage(err.message||'Không thể xử lý tài khoản trong trình duyệt này.','#ff8a9b');}
- finally{submit.disabled=false;submit.style.opacity='1';}
+ }catch(err){setFeedback(err.message||'Unable to access local account storage.',true);}
+ finally{btn.disabled=false;btn.style.opacity='1';}
 });
-function logout(){activeUser='';localStorage.removeItem('netscary_session_v2');$('password').value='';$('confirmPassword').value='';setAuthMode('login');setView('authView');}
-$('logoutBtn').addEventListener('click',logout);$('exitLogout').addEventListener('click',logout);
-function setAim(el,exit){
- aimButton=el||null;aimExit=!!exit;
- if(scene3d){scene3d.targetMode=aimExit?'camera':'button';scene3d.targetElement=aimButton;}
+function setPage(name){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));const titles={overview:'Overview',markets:'Markets',portfolio:'Portfolio',activity:'Activity',learn:'Learn',settings:'Settings'};$('crumbTitle').textContent=titles[name]||'Overview';if(name==='markets')renderMarketRows();if(name==='portfolio')renderPortfolio();if(name==='activity')renderActivity();if(name==='settings')loadPrefsForm();drawActiveChart();}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>setPage(b.dataset.go)));
+$('logoutBtn').addEventListener('click',signOut);$('settingsLogout').addEventListener('click',signOut);$('topAvatar').addEventListener('click',()=>setPage('settings'));$('helpBtn').addEventListener('click',()=>setPage('learn'));
+function holdingValue(symbol){const h=account.holdings[symbol];return h? h.qty*symbolAsset(symbol).price:0;}
+function totalInvested(){return Object.keys(account.holdings).reduce((s,k)=>s+holdingValue(k),0);}
+function unrealizedPL(){return Object.keys(account.holdings).reduce((s,k)=>{const h=account.holdings[k];return s+h.qty*(symbolAsset(k).price-h.avgCost);},0);}
+function equity(){return account.cash+totalInvested();}
+function heldQty(symbol){return account.holdings[symbol]?account.holdings[symbol].qty:0;}
+function initSymbolSelect(){const el=$('tradeSymbolSelect');el.innerHTML=assets.map(a=>'<option value="'+a.symbol+'">'+a.symbol+' — '+escapeHtml(a.name)+'</option>').join('');el.value=tradeSymbol;}
+function assetLogoHTML(a){return '<span class="stockMini" style="background:'+a.color+'18;color:'+a.color+';border-color:'+a.color+'25">'+escapeHtml(a.logo)+'</span>';}
+function assetNameHTML(a){return '<div class="tableAsset">'+assetLogoHTML(a)+'<div><div class="tablePrimary">'+a.symbol+'</div><div class="tableSecondary">'+escapeHtml(a.name)+'</div></div></div>';}
+function changePct(a){return (a.price/a.open-1)*100;}
+function valueClass(n){return n>=0?'positive':'negative';}
+function emptyRow(cols,message){return '<tr><td colspan="'+cols+'"><div class="emptyState">'+message+'</div></td></tr>';}
+function sparkline(canvas,values,color){if(!canvas)return;const w=Math.max(40,canvas.clientWidth||54),h=Math.max(18,canvas.clientHeight||23),dpr=Math.min(devicePixelRatio||1,2);canvas.width=w*dpr;canvas.height=h*dpr;const c=canvas.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);if(!values||values.length<2)return;let mn=Math.min(...values),mx=Math.max(...values);if(mx===mn)mx=mn+1;const pts=values.map((v,i)=>[i*(w-2)/(values.length-1)+1,h-2-(v-mn)/(mx-mn)*(h-5)]);c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.strokeStyle=color;c.lineWidth=1.5;c.stroke();c.lineTo(w-1,h);c.lineTo(1,h);c.closePath();c.fillStyle=color+'20';c.fill();}
+function drawDecorChart(){const c=$('authChart');if(!c)return;const w=c.clientWidth||600,h=c.clientHeight||180,d=Math.min(devicePixelRatio||1,2);c.width=w*d;c.height=h*d;const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,w,h);g.strokeStyle='#91edc51a';g.lineWidth=1;for(let y=0;y<h;y+=34){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke();}let pts=[],v=h*.67;for(let i=0;i<85;i++){v+=randomBetween(-5,5);v=Math.max(h*.2,Math.min(h*.82,v));pts.push([i*w/84,v]);}g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle='#78e9bc';g.lineWidth=1.7;g.stroke();g.lineTo(w,h);g.lineTo(0,h);g.closePath();const grad=g.createLinearGradient(0,0,0,h);grad.addColorStop(0,'#43d6a035');grad.addColorStop(1,'#43d6a000');g.fillStyle=grad;g.fill();const p=pts[pts.length-1];g.beginPath();g.arc(p[0],p[1],3,0,Math.PI*2);g.fillStyle='#a9f6d2';g.fill();}
+function renderOverview(){
+ const invested=totalInvested(),eq=equity(),pl=unrealizedPL(),totalPL=eq-account.initialCapital;
+ $('totalEquity').textContent=money(eq);$('cashBalance').textContent=money(account.cash);$('investedValue').textContent=money(invested);$('positionsCount').textContent=Object.keys(account.holdings).filter(k=>account.holdings[k].qty>0).length+' open positions';
+ $('equityDelta').textContent=(totalPL>=0?'+':'')+money(totalPL);$('equityDelta').className='delta '+valueClass(totalPL);
+ $('unrealizedValue').textContent=(pl>=0?'+':'')+money(pl);$('unrealizedValue').className='metricValue num '+valueClass(pl);
+ const cost=invested-pl;$('unrealizedPct').textContent=pct(cost>0?pl/cost*100:0);$('unrealizedPct').className=valueClass(pl);
+ const equityValues=(account.equityHistory||[account.initialCapital]).concat([eq]).slice(-28);
+ sparkline($('sparkEquity'),equityValues,'#77e7b9');sparkline($('sparkCash'),[account.cash*.98,account.cash*1.01,account.cash*.99,account.cash], '#89aaff');
+ sparkline($('sparkInvested'),[invested*.82,invested*.9,invested*.86,invested], '#e5c58b');sparkline($('sparkPL'),[pl*.5,pl*.7,pl*.8,pl],pl>=0?'#43d6a1':'#ff6e7d');
+ renderWatchlist();renderMovers();renderPositionsPreview();renderRecentActivity();renderSelectedAsset();drawAllocation();
 }
-document.querySelectorAll('[data-aim]').forEach(el=>{
- el.addEventListener('pointerenter',()=>setAim(el,false));
- el.addEventListener('focus',()=>setAim(el,false));
-});
-document.querySelectorAll('[data-action]').forEach(el=>{
- el.addEventListener('click',()=>{
-  const act=el.dataset.action;
-  if(act==='menu')setView('menuView');
-  if(act==='settings'){syncSettingsInputs();setView('settingsView');}
-  if(act==='play'){resetBoard();setView('gameView');}
- });
-});
-document.querySelectorAll('[data-action="play"]').forEach(el=>el.addEventListener('click',()=>{resetBoard();setView('gameView');}));
-$('returnMenu').addEventListener('click',()=>setView('menuView'));
-$('loginTab').addEventListener('pointerenter',()=>setMessage(''));
-$('registerTab').addEventListener('pointerenter',()=>setMessage(''));
-function syncSettingsInputs(){ $('xColor').value=settings.xColor;$('oColor').value=settings.oColor;$('boardColor').value=settings.boardColor;$('brightness').value=settings.brightness;$('difficulty').value=settings.difficulty||'normal';}
-function readSettings(){settings={xColor:$('xColor').value,oColor:$('oColor').value,boardColor:$('boardColor').value,brightness:Number($('brightness').value),difficulty:$('difficulty').value};applySettings();}
-['xColor','oColor','boardColor','brightness','difficulty'].forEach(id=>$(id).addEventListener('input',readSettings));
-$('saveSettings').addEventListener('click',()=>{readSettings();localStorage.setItem('netscary_settings_v2',JSON.stringify(settings));$('saveSettings').textContent='ĐÃ LƯU ✓';setTimeout(()=>$('saveSettings').textContent='LƯU CÀI ĐẶT',1300);});
-$('resetSettings').addEventListener('click',()=>{settings={...defaultSettings};applySettings();localStorage.setItem('netscary_settings_v2',JSON.stringify(settings));});
-$('gameSettings').addEventListener('click',()=>{syncSettingsInputs();setView('settingsView');});
-$('gameMode').addEventListener('change',()=>{gameMode=$('gameMode').value;resetBoard();});
-$('restartGame').addEventListener('click',resetBoard);
-function checkWinner(b){
- const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
- for(const l of lines)if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return {mark:b[l[0]],line:l};
- return b.every(Boolean)?{mark:'draw',line:[]}:null;
-}
-function renderBoard(){
- const cells=$('board').querySelectorAll('.cell');
- cells.forEach((cell,i)=>{const mark=board[i];cell.textContent=mark||'';cell.classList.toggle('x',mark==='X');cell.classList.toggle('o',mark==='O');cell.classList.toggle('winner',winningLine.includes(i));cell.disabled=gameOver||!!mark||(gameMode==='ai'&&turn==='O');});
- $('turnMark').textContent=gameOver?'—':turn;$('turnMark').style.color=turn==='X'?'var(--x-color)':'var(--o-color)';
-}
-function resetBoard(){
- board=Array(9).fill(null);turn='X';gameOver=false;winningLine=[];gameMode=$('gameMode').value||'ai';
- $('gameMessage').textContent=gameMode==='ai'?'Bạn là X. Hãy chọn một ô để đi nước đầu tiên.':'Hai người chơi luân phiên X và O.';
- renderBoard();
-}
-function finishMove(){
- const res=checkWinner(board);
- if(res){gameOver=true;winningLine=res.line;if(res.mark==='draw')$('gameMessage').textContent='Hòa rồi! Một ván nữa nhé.';else $('gameMessage').textContent=(res.mark==='X'?'X thắng!':'O thắng!')+' Chúc mừng!';renderBoard();return true;}
- turn=turn==='X'?'O':'X';renderBoard();return false;
-}
-function chooseAI(){
- const empty=board.map((v,i)=>v===null?i:-1).filter(i=>i>=0);if(!empty.length)return -1;
- function findMove(mark){for(const i of empty){const b=board.slice();b[i]=mark;if(checkWinner(b)?.mark===mark)return i;}return -1;}
- let m=-1;
- if(settings.difficulty==='hard')m=findMove('O');
- if(m<0)m=findMove('X');
- if(m<0&&board[4]===null)m=4;
- if(m<0){const corners=[0,2,6,8].filter(i=>board[i]===null);if(corners.length)m=corners[Math.floor(Math.random()*corners.length)];}
- if(m<0)m=empty[Math.floor(Math.random()*empty.length)];
- return m;
-}
-function cellClick(e){
- const i=Number(e.currentTarget.dataset.cell);if(gameOver||board[i]||turn!=='X')return;
- board[i]='X';if(finishMove())return;
- if(gameMode==='ai'&&turn==='O'){
-  $('gameMessage').textContent='Máy đang suy nghĩ…';renderBoard();
-  window.setTimeout(()=>{if(currentView!=='gameView'||gameOver||turn!=='O')return;const move=chooseAI();if(move>=0)board[move]='O';if(!finishMove())$('gameMessage').textContent='Đến lượt bạn — tìm nước đi tốt nhất.';},330);
- }else $('gameMessage').textContent='Đến lượt '+turn+'.';
-}
-$('board').querySelectorAll('.cell').forEach(cell=>cell.addEventListener('click',cellClick));
-function showExit(){setView('exitView');setAim(null,true);}
-document.querySelectorAll('[data-action="exit"]').forEach(el=>el.addEventListener('click',showExit));
-$('exitLogout').addEventListener('pointerenter',()=>setAim($('exitLogout'),false));
-$('returnMenu').addEventListener('pointerenter',()=>setAim($('returnMenu'),false));
-try{const remembered=localStorage.getItem('netscary_session_v2'),all=users();if(remembered&&all[remembered.toLowerCase()]){activeUser=all[remembered.toLowerCase()].name;$('userLabel').textContent=activeUser;$('exitGreeting').textContent='Tài khoản '+activeUser+' đã sẵn sàng.';setView('menuView');}}catch(e){}
-applySettings();
-function init3D(){
- const canvas=$('world');
- if(!window.THREE){$('sceneStatus').innerHTML='<span class="pulse" style="background:#ec5368"></span><span>3D LIBRARY NOT LOADED</span>';$('sceneError').style.display='block';$('sceneError').textContent='Không tải được Three.js. Kiểm tra kết nối Internet rồi tải lại trang.';return;}
- try{
-  const T=window.THREE,scene=new T.Scene();scene.background=new T.Color(0x090b12);scene.fog=new T.FogExp2(0x090b12,.033);
-  const camera=new T.PerspectiveCamera(43,innerWidth/innerHeight,.1,100);camera.position.set(0,2.6,10.7);camera.lookAt(0,1.45,0);
-  const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight,false);renderer.outputEncoding=T.sRGBEncoding;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.08;
-  const sceneGroup=new T.Group();scene.add(sceneGroup);
-  const mat=(color,rough=.9,metal=0,emissive=0)=>new T.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:emissive});
-  const clay=mat(0xb67b54,.96),clayLight=mat(0xd39a6b,.95),clayShadow=mat(0x82533d,.98),shirt=mat(0x262b39,.92),shirtTrim=mat(0x41495b,.8),pants=mat(0x292a36,.96),shoe=mat(0x171821,.82),hair=mat(0x28201f,.99),white=mat(0xf4e7d0,.64),black=mat(0x171318,.6),torch=mat(0x5d6471,.32,.72),gold=mat(0xe0b46f,.48,.4),glow=new T.MeshBasicMaterial({color:0xffdda0});
-  const boxG=new T.BoxGeometry(1,1,1),sphereG=new T.SphereGeometry(1,20,16),cylG=new T.CylinderGeometry(1,1,1,16),torusG=new T.TorusGeometry(.3,.028,8,24);
-  function mesh(parent,geo,m,pos,scale){const o=new T.Mesh(geo,m);o.position.set(pos[0],pos[1],pos[2]);if(scale)o.scale.set(scale[0],scale[1],scale[2]);o.castShadow=false;o.receiveShadow=false;parent.add(o);return o;}
-  function ball(parent,m,pos,scale){return mesh(parent,sphereG,m,pos,scale);}
-  function block(parent,m,pos,scale,rot){const o=mesh(parent,boxG,m,pos,scale);if(rot)o.rotation.set(rot[0],rot[1],rot[2]);return o;}
-  function bone(parent,m,a,b,r1,r2){const A=new T.Vector3(...a),B=new T.Vector3(...b),d=B.clone().sub(A),o=mesh(parent,cylG,m,A.clone().add(B).multiplyScalar(.5).toArray(),[r1,d.length(),r2||r1]);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),d.normalize());return o;}
-  scene.add(new T.HemisphereLight(0xb9cced,0x3b2730,1.15));
-  const ambient=new T.AmbientLight(0xbac7e3,.9);scene.add(ambient);
-  const fill=new T.DirectionalLight(0xabbcff,1.3);fill.position.set(-4,8,7);scene.add(fill);
-  const rim=new T.PointLight(0xec4869,36,18,2);rim.position.set(4,4,0);scene.add(rim);
-  const blue=new T.PointLight(0x43cbe2,29,20,2);blue.position.set(-5,3,-1);scene.add(blue);
-  const stage=mesh(scene,new T.CylinderGeometry(3.7,4.1,.28,64),mat(0x171a25,.65,.18),[2.5,.02,-.2],[1,1,1]);stage.rotation.y=.14;
-  const ring=mesh(scene,torusG,new T.MeshBasicMaterial({color:0x46516a}),[2.5,.19,-.2],[7.7,7.7,7.7]);ring.rotation.x=Math.PI/2;
-  const floor=mesh(scene,new T.PlaneGeometry(200,200),mat(0x10121b,.8,.1),[0,-.15,-2],[1,1,1]);floor.rotation.x=-Math.PI/2;
-  /* Distant light bars create depth while all controls stay in the HTML layer. */
-  for(let i=0;i<12;i++){
-   const x=-7+i*1.25;const bar=mesh(scene,boxG,new T.MeshBasicMaterial({color:i%2?0x232e42:0x412131}),[x,4.0,-6],[.025,5.5,.04]);
-   if(i%3===0){const dot=mesh(scene,sphereG,new T.MeshBasicMaterial({color:i%2?0x70d8ed:0xff597a}),[x,1.1,-5.8],[.035,.035,.035]);}
-  }
-  /* Hand-made clay character, not a flat image: head, ears, hair, brows, eyes, nose, mouth and clothes. */
-  const man=new T.Group();man.position.set(2.55,0,.35);man.rotation.y=-.11;scene.add(man);
-  ball(man,clay,[0,1.23,0],[.53,.64,.37]);
-  block(man,shirt,[0,.74,0],[.82,.92,.48],[.04,0,.01]);
-  ball(man,shirt,[0,.48,0],[.46,.23,.28]);
-  bone(man,pants,[-.22,.65,0],[-.29,.17,.035],.17);bone(man,pants,[.22,.65,0],[.3,.17,.035],.17);
-  ball(man,shoe,[-.3,.14,.13],[.23,.13,.37]);ball(man,shoe,[.3,.14,.13],[.23,.13,.37]);
-  ball(man,clay,[0,1.74,.01],[.18,.24,.18]);
-  /* Neck scarf / collar. */
-  ball(man,shirtTrim,[0,1.59,.06],[.3,.13,.26]);
-  for(const side of [-1,1]){
-   ball(man,clay,[side*.52,1.25,0],[.12,.17,.13]);
-   ball(man,clayLight,[side*.145,1.28,.315],[.105,.085,.055]);
-   ball(man,black,[side*.145,1.285,.361],[.049,.057,.025]);
-   ball(man,white,[side*.132,1.31,.383],[.016,.018,.012]);
-   const brow=block(man,hair,[side*.15,1.405,.33],[.17,.045,.075],[0,0,side*-.14]);
-  }
-  ball(man,clayLight,[0,1.19,.38],[.075,.115,.09]);
-  ball(man,clayShadow,[0,1.105,.43],[.15,.027,.022]);
-  /* Soft clay hairstyle with distinct sculpted locks. */
-  ball(man,hair,[0,1.61,-.025],[.48,.24,.38]);
-  for(let i=0;i<7;i++){const x=-.38+i*.125;ball(man,hair,[x,1.59+Math.sin(i*1.6)*.075,.16],[.14,.16,.18]);}
-  ball(man,hair,[-.37,1.43,.05],[.12,.22,.19]);ball(man,hair,[.37,1.43,.05],[.12,.22,.19]);
-  /* Coat seams/buttons for a handcrafted/clay aesthetic. */
-  block(man,shirtTrim,[-.22,.96,.25],[.035,.59,.025],[0,0,-.08]);
-  for(let y of [.82,.99,1.16])ball(man,gold,[.07,y,.261],[.027,.027,.018]);
-  /* Aimable arm and an oversized flashlight prop. The glow follows the currently focused UI button. */
-  const arm=new T.Group();arm.position.set(-.38,1.34,.09);man.add(arm);
-  ball(arm,clay,[-.025,0,.08],[.17,.18,.18]);
-  block(arm,shirt,[0,0,.27],[.23,.23,.52],[0,0,-.12]);
-  ball(arm,clayLight,[0,-.015,.52],[.12,.12,.13]);
-  const torchBody=mesh(arm,cylG,torch,[0,0,.72],[.075,.42,.075]);torchBody.rotation.x=Math.PI/2;
-  const torchHead=mesh(arm,cylG,gold,[0,0,.91],[.12,.12,.11]);torchHead.rotation.x=Math.PI/2;
-  ball(arm,glow,[0,0,.985],[.075,.075,.045]);
-  const lens=mesh(arm,cylG,glow,[0,0,.94],[.09,.04,.09]);lens.rotation.x=Math.PI/2;
-  const otherArm=new T.Group();otherArm.position.set(.4,1.27,.03);man.add(otherArm);
-  bone(otherArm,shirt,[0,0,0],[.08,-.27,.15],.12);ball(otherArm,clay,[.08,-.29,.16],[.13,.12,.12]);
-  const beamMat=new T.MeshBasicMaterial({color:0xffdda0,transparent:true,opacity:.11,depthWrite:false,side:T.DoubleSide});
-  const beam=mesh(scene,new T.ConeGeometry(.25,1,18,1,true),beamMat,[0,0,0],[1,1,1]);beam.visible=false;
-  const targetDot=mesh(scene,new T.SphereGeometry(.045,10,8),new T.MeshBasicMaterial({color:0xffdda0}),[0,0,0],[1,1,1]);targetDot.visible=false;
-  scene3d={T,scene,camera,renderer,ambient,fill,man,arm,beam,targetDot,torchBody,targetMode:currentView==='exitView'?'camera':'button',targetElement:currentView==='menuView'?$('menuView').querySelector('[data-aim="play"]'):currentView==='settingsView'?$('saveSettings'):currentView==='gameView'?$('board').querySelector('[data-cell="4"]'):$('loginTab'),clock:0};
-  $('sceneStatus').innerHTML='<span class="pulse"></span><span>3D CLAY SCENE ONLINE</span>';
-  applySettings();
-  function aimUpdate(){
-   if(!scene3d)return;
-   const r=renderer.domElement.getBoundingClientRect(),w=innerWidth,h=innerHeight;
-   let ndcX=0,ndcY=0,valid=true;
-   const targetElement=scene3d.targetElement;
-   if(scene3d.targetMode==='camera'){ndcX=0;ndcY=0;}
-   else if(targetElement&&targetElement.isConnected){
-    const b=targetElement.getBoundingClientRect();ndcX=((b.left+b.width/2)/w)*2-1;ndcY=-((b.top+b.height/2)/h)*2+1;
-   }else valid=false;
-   if(!valid){ndcX=.15;ndcY=.05;}
-   const world=new T.Vector3(ndcX,ndcY,.58).unproject(camera);
-   const dir=world.sub(camera.position).normalize();
-   const target=camera.position.clone().add(dir.multiplyScalar(5.6));
-   man.updateMatrixWorld(true);
-   const local=man.worldToLocal(target.clone());
-   const start=new T.Vector3(arm.position.x,arm.position.y,arm.position.z+.98);
-   const aim=local.sub(start).normalize();
-   arm.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),aim);
-   const torchTip=arm.localToWorld(new T.Vector3(0,0,1.0));
-   const ray=target.clone().sub(torchTip);const len=ray.length();
-   beam.visible=true;beam.position.copy(torchTip).add(target).multiplyScalar(.5);beam.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),ray.normalize());beam.scale.set(1,len,1);
-   beam.material.opacity=scene3d.targetMode==='camera'?.24:.12;
-   targetDot.position.copy(target);targetDot.visible=true;
-  }
-  function animate(){
-   if(!scene3d)return;requestAnimationFrame(animate);
-   scene3d.clock+=.012;const t=scene3d.clock;
-   man.position.y=Math.sin(t*1.1)*.025;man.rotation.y=-.11+Math.sin(t*.55)*.035;
-   aimUpdate();
-   renderer.render(scene,camera);
-  }
-  animate();
-  window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);});
- }catch(err){
-  console.error(err);$('sceneStatus').innerHTML='<span class="pulse" style="background:#ec5368"></span><span>3D UNAVAILABLE</span>';
-  $('sceneError').style.display='block';$('sceneError').textContent='Không khởi tạo được WebGL 3D: '+String(err.message||err);
+function renderWatchlist(){const rows=assets.filter(a=>a.watch).slice(0,6);$('watchlistRows').innerHTML=rows.map(a=>'<div class="stockRow" data-select="'+a.symbol+'"><div class="stockIdentity">'+assetLogoHTML(a)+'<div><div class="stockSymbol">'+a.symbol+'</div><div class="stockCompany">'+escapeHtml(a.name)+'</div></div></div><div><div class="stockPrice">'+money(a.price)+'</div><div class="stockChange '+valueClass(changePct(a))+'">'+pct(changePct(a))+'</div></div></div>').join('');wireSelectRows($('watchlistRows'));}
+function renderMovers(){const rows=assets.slice().sort((a,b)=>Math.abs(changePct(b))-Math.abs(changePct(a))).slice(0,3);$('moversRows').innerHTML=rows.map(a=>'<div class="stockRow" data-select="'+a.symbol+'"><div class="stockIdentity">'+assetLogoHTML(a)+'<div><div class="stockSymbol">'+a.symbol+'</div><div class="stockCompany">'+(changePct(a)>=0?'Momentum up':'Pullback')+'</div></div></div><div><div class="stockPrice '+valueClass(changePct(a))+'">'+pct(changePct(a))+'</div><div class="stockChange muted">sim. move</div></div></div>').join('');wireSelectRows($('moversRows'));}
+function renderPositionsPreview(){const keys=Object.keys(account.holdings).filter(k=>account.holdings[k].qty>0);$('positionPreview').innerHTML=keys.length?keys.slice(0,5).map(k=>{const h=account.holdings[k],a=symbolAsset(k),v=h.qty*a.price,pl=h.qty*(a.price-h.avgCost);return '<tr><td>'+assetNameHTML(a)+'</td><td class="num">'+h.qty+'</td><td class="num">'+money(a.price)+'</td><td class="num">'+money(v)+'</td><td class="num '+valueClass(pl)+'">'+(pl>=0?'+':'')+money(pl)+'</td><td><button class="btn small buy" data-trade="BUY" data-symbol="'+k+'">Trade</button></td></tr>';}).join(''):emptyRow(6,'No open positions yet. Choose <b>New trade</b> to make your first paper order.');wireTradeButtons($('positionPreview'));}
+function renderRecentActivity(){const list=account.trades.slice(0,5);$('recentActivity').innerHTML=list.length?list.map(t=>'<div class="stockRow" style="cursor:default"><div class="stockIdentity"><div class="activityIcon '+t.side.toLowerCase()+'">'+(t.side==='BUY'?'↘':'↗')+'</div><div><div class="stockSymbol">'+t.side+' · '+t.symbol+'</div><div class="stockCompany">'+new Date(t.time).toLocaleString()+' · '+t.qty+' shares</div></div></div><div><div class="stockPrice">'+money(t.total)+'</div><div class="stockChange muted">'+money(t.price)+' / share</div></div></div>').join(''):'<div class="emptyState">Your activity will appear here after your first simulated trade.</div>';}
+function renderMarketRows(){const q=($('marketSearch').value||'').trim().toLowerCase(),sort=$('marketSort').value;let list=assets.filter(a=>(a.symbol+' '+a.name).toLowerCase().includes(q));if(sort==='change')list.sort((a,b)=>changePct(b)-changePct(a));else if(sort==='price')list.sort((a,b)=>b.price-a.price);else list.sort((a,b)=>a.symbol.localeCompare(b.symbol));$('marketCount').textContent=list.length+' instruments available';$('marketRows').innerHTML=list.map(a=>'<tr data-select="'+a.symbol+'"><td>'+assetNameHTML(a)+' </td><td class="priceCell">'+money(a.price)+'</td><td class="priceCell '+valueClass(changePct(a))+'">'+pct(changePct(a))+'</td><td class="priceCell muted">'+(a.volume/1e6).toFixed(2)+'M</td><td><div class="rowActions"><button class="btn small" data-watch="'+a.symbol+'">'+(a.watch?'★ Saved':'☆ Watch')+'</button><button class="btn small buy" data-trade="BUY" data-symbol="'+a.symbol+'">Trade</button></div></td></tr>').join('')||emptyRow(5,'No instruments match that search.');wireTradeButtons($('marketRows'));wireSelectRows($('marketRows'));$('marketRows').querySelectorAll('[data-watch]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const a=symbolAsset(b.dataset.watch);a.watch=!a.watch;renderMarketRows();renderWatchlist();toast(a.symbol+(a.watch?' added to':' removed from')+' watchlist.');}));}
+function renderPortfolio(){const eq=equity(),iv=totalInvested(),pl=unrealizedPL();$('portfolioEquity').textContent=money(eq);$('portfolioCash').textContent=money(account.cash);$('portfolioInvested').textContent=money(iv);$('portfolioPL').textContent=(pl>=0?'+':'')+money(pl);$('portfolioPL').className=valueClass(pl);$('portfolioSummary').textContent='Virtual starting capital: '+money(account.initialCapital)+'. No real funds are involved.';const keys=Object.keys(account.holdings).filter(k=>account.holdings[k].qty>0);$('portfolioRows').innerHTML=keys.length?keys.map(k=>{const h=account.holdings[k],a=symbolAsset(k),v=h.qty*a.price,p=h.qty*(a.price-h.avgCost);return '<tr><td>'+assetNameHTML(a)+'</td><td class="num">'+h.qty+'</td><td class="num">'+money(h.avgCost)+'</td><td class="num">'+money(a.price)+'</td><td class="num">'+money(v)+'</td><td class="num '+valueClass(p)+'">'+(p>=0?'+':'')+money(p)+'</td><td><button class="btn small sell" data-trade="SELL" data-symbol="'+k+'">Sell</button></td></tr>';}).join(''):emptyRow(7,'No holdings yet. Buy a few virtual shares to see your portfolio allocation.');wireTradeButtons($('portfolioRows'));drawAllocation();renderMarketRowsIfActive();}
+function renderMarketRowsIfActive(){if($('page-markets').classList.contains('active'))renderMarketRows();}
+function drawAllocation(){const c=$('allocationChart');if(!c)return;const w=c.clientWidth||300,h=c.clientHeight||130,d=Math.min(devicePixelRatio||1,2);c.width=w*d;c.height=h*d;const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,w,h);const holdingKeys=Object.keys(account.holdings).filter(k=>account.holdings[k].qty>0);const vals=holdingKeys.map(k=>({symbol:k,value:holdingValue(k),color:symbolAsset(k).color}));const cash=account.cash;const total=vals.reduce((s,v)=>s+v.value,0)+cash;const all=vals.concat([{symbol:'Cash',value:cash,color:'#3f4d60'}]);const cx=w/2,cy=h/2,r=Math.min(h*.39,w*.19),line=Math.max(12,Math.min(20,h*.15));let angle=-Math.PI/2;if(total<=0){g.beginPath();g.arc(cx,cy,r,0,Math.PI*2);g.strokeStyle='#273341';g.lineWidth=line;g.stroke();}else{all.filter(v=>v.value>0).forEach(v=>{const end=angle+v.value/total*Math.PI*2;g.beginPath();g.arc(cx,cy,r,angle,end);g.strokeStyle=v.color;g.lineWidth=line;g.stroke();angle=end;});}g.textAlign='center';g.textBaseline='middle';g.fillStyle='#ecf4fa';g.font='600 '+Math.max(11,Math.min(15,w*.055))+'px "Space Grotesk"';g.fillText(moneyShort(total),cx,cy-2);g.fillStyle='#8190a1';g.font='9px "DM Sans"';g.fillText('TOTAL VALUE',cx,cy+13);$('allocationLegend').innerHTML=all.filter(v=>v.value>0).slice().sort((a,b)=>b.value-a.value).slice(0,5).map(v=>'<div class="legendItem"><span class="dot" style="background:'+v.color+'"></span><span>'+v.symbol+'</span><strong>'+((v.value/Math.max(total,1))*100).toFixed(1)+'%</strong></div>').join('')||'<div class="emptyState">No allocated assets yet.</div>';}
+function renderActivity(){const filter=$('activityFilter').value,list=account.trades.filter(t=>filter==='all'||t.side===filter);$('activityRows').innerHTML=list.length?list.map(t=>'<tr><td>'+new Date(t.time).toLocaleString()+'</td><td class="'+(t.side==='BUY'?'positive':'negative')+'">'+t.side+'</td><td>'+assetNameHTML(symbolAsset(t.symbol))+'</td><td class="num">'+t.qty+'</td><td class="num">'+money(t.price)+'</td><td class="num">'+money(t.total)+'</td><td class="num">'+money(t.fee)+'</td></tr>').join(''):emptyRow(7,'No transactions yet. Your simulated orders will be recorded here.');}
+function wireSelectRows(root){root.querySelectorAll('[data-select]').forEach(row=>row.addEventListener('click',e=>{if(e.target.closest('button'))return;selectAsset(row.dataset.select,true);}));}
+function wireTradeButtons(root){root.querySelectorAll('[data-trade]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openTrade(b.dataset.symbol,b.dataset.trade);}));}
+function renderAll(){renderOverview();renderMarketRows();renderPortfolio();renderActivity();renderSelectedAsset();loadPrefsForm();}
+function selectAsset(symbol,showChart){if(!assets.some(a=>a.symbol===symbol))return;selectedSymbol=symbol;renderSelectedAsset();if(showChart){setPage('overview');$('chartPrice').scrollIntoView({block:'nearest',behavior:'smooth'});}}
+function renderSelectedAsset(){const a=symbolAsset(selectedSymbol);if(!a)return;$('chartLogo').textContent=a.logo;$('chartLogo').style.background=a.color+'20';$('chartLogo').style.color=a.color;$('chartCompany').textContent=a.name;$('chartMeta').textContent=a.exchange+' · '+a.symbol+' · Simulated quote';$('chartPrice').textContent=money(a.price);const cp=changePct(a);$('chartChange').textContent=(cp>=0?'+':'')+pct(cp)+' today';$('chartChange').className='chartChange '+valueClass(cp);$('bottomTicker').textContent=a.symbol;$('chartLegendLabel').textContent=a.symbol+' simulated price';$('lastUpdate').textContent=new Date().toLocaleTimeString();drawActiveChart();}
+function chartRows(a){const n=chartRange==='1D'?36:chartRange==='1W'?52:chartRange==='1M'?64:100;return a.history.slice(-n);}
+function drawActiveChart(){const c=$('priceChart');if(!c||!assets.length)return;const a=symbolAsset(selectedSymbol);if(!a)return;const w=c.clientWidth||500,h=c.clientHeight||250,d=Math.min(devicePixelRatio||1,2);if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d);}const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);g.clearRect(0,0,w,h);const rows=chartRows(a);if(rows.length<2)return;const pad={l:8,r:65,t:10,b:23},cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;const low=Math.min(...rows.map(r=>r.low)),high=Math.max(...rows.map(r=>r.high)),spread=Math.max(high-low,a.price*.005),min=low-spread*.08,max=high+spread*.08;
+ const x=i=>pad.l+i*cw/(rows.length-1),y=v=>pad.t+(max-v)/(max-min)*ch;
+ g.font='9px "DM Mono", monospace';g.textAlign='left';g.textBaseline='middle';
+ for(let i=0;i<5;i++){const yy=pad.t+i*ch/4,val=max-i*(max-min)/4;g.beginPath();g.moveTo(pad.l,yy);g.lineTo(w-pad.r+5,yy);g.strokeStyle='#ffffff0d';g.lineWidth=1;g.stroke();g.fillStyle='#718094';g.fillText(moneyShort(val),w-pad.r+10,yy);}
+ for(let i=0;i<5;i++){const ix=Math.round(i*(rows.length-1)/4),label=chartRange==='1D'?['09:30','11:00','12:30','14:00','16:00'][i]:chartRange==='1W'?['MON','TUE','WED','THU','FRI'][i]:chartRange==='1M'?['W1','W2','W3','W4','NOW'][i]:['JAN','APR','JUL','OCT','NOW'][i];g.fillStyle='#667588';g.textAlign=i===0?'left':i===4?'right':'center';g.textBaseline='bottom';g.fillText(label,x(ix),h-3);}
+ const up='#43d6a1',down='#ff6e7d';
+ if(chartKind==='line'){
+  const pts=rows.map((r,i)=>[x(i),y(r.close)]);const grad=g.createLinearGradient(0,pad.t,0,pad.t+ch);grad.addColorStop(0,'#43d6a035');grad.addColorStop(1,'#43d6a000');g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.lineTo(pts[pts.length-1][0],pad.t+ch);g.lineTo(pts[0][0],pad.t+ch);g.closePath();g.fillStyle=grad;g.fill();g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=changePct(a)>=0?up:down;g.lineWidth=1.8;g.stroke();const p=pts[pts.length-1];g.beginPath();g.arc(p[0],p[1],3,0,Math.PI*2);g.fillStyle=changePct(a)>=0?up:down;g.fill();
+ }else{
+  const step=cw/rows.length,bw=Math.max(2,Math.min(9,step*.58));
+  rows.forEach((r,i)=>{const xx=x(i),yo=y(r.open),yc=y(r.close),yh=y(r.high),yl=y(r.low),color=r.close>=r.open?up:down;g.strokeStyle=color;g.lineWidth=1;g.beginPath();g.moveTo(xx,yh);g.lineTo(xx,yl);g.stroke();g.fillStyle=color;g.fillRect(xx-bw/2,Math.min(yo,yc),bw,Math.max(1,Math.abs(yc-yo)));});
  }
+ const last=rows[rows.length-1],py=y(last.close);g.setLineDash([3,4]);g.beginPath();g.moveTo(pad.l,py);g.lineTo(w-pad.r+4,py);g.strokeStyle=changePct(a)>=0?'#43d6a080':'#ff6e7d80';g.stroke();g.setLineDash([]);
 }
-document.querySelectorAll('[data-aim]').forEach(el=>el.addEventListener('click',()=>{setAim(el,false);}));
-window.addEventListener('error',e=>{if(e.message&&e.message.indexOf('THREE')>=0){$('sceneError').style.display='block';$('sceneError').textContent='Lỗi thư viện 3D: '+e.message;}});
-setTimeout(()=>$('loading').classList.add('done'),650);
-init3D();
+function openTrade(symbol,side){tradeSymbol=symbol||selectedSymbol;tradeSide=side||'BUY';$('tradeSymbolSelect').value=tradeSymbol;$('tradeQty').value='1';$('tradeFeedback').textContent='';$('tradeModal').classList.add('open');setTradeSide(tradeSide);updateTradeTicket();setTimeout(()=>$('tradeQty').focus(),40);}
+function closeTrade(){$('tradeModal').classList.remove('open');}
+$('closeTrade').addEventListener('click',closeTrade);$('tradeModal').addEventListener('click',e=>{if(e.target===$('tradeModal'))closeTrade();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTrade();if(e.key==='/'&&!$('appShell').classList.contains('hidden')&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$('globalSearch').focus();}});
+$('quickBuy').addEventListener('click',()=>openTrade(selectedSymbol,'BUY'));$('portfolioBuy').addEventListener('click',()=>openTrade(selectedSymbol,'BUY'));$('portfolioBuy2').addEventListener('click',()=>openTrade(selectedSymbol,'BUY'));$('portfolioSell').addEventListener('click',()=>{const k=Object.keys(account.holdings).find(s=>account.holdings[s].qty>0);openTrade(k||selectedSymbol,'SELL');});$('chartTradeBtn').addEventListener('click',()=>openTrade(selectedSymbol,'BUY'));
+function setTradeSide(side){tradeSide=side;$('buyTab').classList.toggle('active',side==='BUY');$('sellTab').classList.toggle('active',side==='SELL');$('submitTrade').className='btn '+(side==='BUY'?'buy':'sell')+' tradeSubmit';$('submitTrade').textContent='Confirm simulated '+side.toLowerCase();$('orderTotalLabel').textContent=side==='BUY'?'Estimated cash required':'Estimated cash proceeds';updateTradeTicket();}
+$('buyTab').addEventListener('click',()=>setTradeSide('BUY'));$('sellTab').addEventListener('click',()=>setTradeSide('SELL'));
+$('tradeSymbolSelect').addEventListener('change',()=>{tradeSymbol=$('tradeSymbolSelect').value;updateTradeTicket();});$('tradeQty').addEventListener('input',updateTradeTicket);$('qtyMinus').addEventListener('click',()=>{$('tradeQty').value=Math.max(1,(Number($('tradeQty').value)||1)-1);updateTradeTicket();});$('qtyPlus').addEventListener('click',()=>{$('tradeQty').value=Math.min(1000000,(Number($('tradeQty').value)||1)+1);updateTradeTicket();});
+function updateTradeTicket(){const a=symbolAsset(tradeSymbol);if(!a)return;const qty=Math.max(1,Math.floor(Number($('tradeQty').value)||1)),gross=qty*a.price,fee=gross*(Number(prefs.fee)||0),total=tradeSide==='BUY'?gross+fee:gross-fee;$('tradeLogo').textContent=a.logo;$('tradeLogo').style.background=a.color+'20';$('tradeLogo').style.color=a.color;$('tradeName').textContent=a.name;$('tradeSymbol').textContent=a.symbol+' · '+a.exchange+' · simulated';$('tradePrice').textContent=money(a.price);$('sharesAvailable').textContent='Held: '+heldQty(tradeSymbol);$('orderSubtotal').textContent=money(gross);$('orderFee').textContent=money(fee);$('orderTotal').textContent=money(total);$('orderCash').textContent=money(account?account.cash:0);$('tradeFeedback').textContent='';}
+$('submitTrade').addEventListener('click',()=>{
+ const a=symbolAsset(tradeSymbol),qty=Math.floor(Number($('tradeQty').value));if(!a||!Number.isFinite(qty)||qty<1||qty>1000000){$('tradeFeedback').textContent='Enter a valid whole-share quantity.';return;}
+ const h=account.holdings[tradeSymbol]||{qty:0,avgCost:0};const gross=qty*a.price,fee=gross*(Number(prefs.fee)||0);
+ if(tradeSide==='BUY'){
+  if(account.cash<gross+fee){$('tradeFeedback').textContent='Insufficient virtual cash. Reduce the quantity or sell another position.';return;}
+  const nextQty=h.qty+qty;h.avgCost=(h.qty*h.avgCost+gross)/nextQty;h.qty=nextQty;account.holdings[tradeSymbol]=h;account.cash-=gross+fee;
+ }else{
+  if(h.qty<qty){$('tradeFeedback').textContent='You do not own enough shares to sell this quantity.';return;}
+  account.cash+=gross-fee;h.qty-=qty;if(h.qty===0)delete account.holdings[tradeSymbol];else account.holdings[tradeSymbol]=h;
+ }
+ const t={id:Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),time:new Date().toISOString(),side:tradeSide,symbol:tradeSymbol,qty,price:a.price,total:gross,fee};
+ account.trades.unshift(t);account.equityHistory.push(equity());if(account.equityHistory.length>100)account.equityHistory=account.equityHistory.slice(-100);saveAccount();closeTrade();renderAll();toast(tradeSide+' '+qty+' '+tradeSymbol+' share'+(qty===1?'':'s')+' at '+money(a.price)+'. Paper order filled.');
+});
+$('globalSearch').addEventListener('input',()=>{const q=$('globalSearch').value.trim().toLowerCase();if(!q)return;if(assets.some(a=>a.symbol.toLowerCase()===q)){selectAsset(q,false);return;}setPage('markets');$('marketSearch').value=q;renderMarketRows();});
+$('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){const q=$('globalSearch').value.trim().toLowerCase(),a=assets.find(a=>a.symbol.toLowerCase()===q||(a.name.toLowerCase().includes(q)&&q));if(a){selectAsset(a.symbol,true);$('globalSearch').value='';}else setPage('markets');}});
+$('marketSearch').addEventListener('input',renderMarketRows);$('marketSort').addEventListener('change',renderMarketRows);$('activityFilter').addEventListener('change',renderActivity);
+document.querySelectorAll('[data-range]').forEach(b=>b.addEventListener('click',()=>{chartRange=b.dataset.range;document.querySelectorAll('[data-range]').forEach(x=>x.classList.toggle('active',x===b));drawActiveChart();}));
+document.querySelectorAll('[data-chart]').forEach(b=>b.addEventListener('click',()=>{chartKind=b.dataset.chart;document.querySelectorAll('[data-chart]').forEach(x=>x.classList.toggle('active',x===b));drawActiveChart();}));
+function loadPrefsForm(){$('currencySelect').value=prefs.currency;$('feeSelect').value=String(prefs.fee);$('autoRefresh').checked=prefs.autoRefresh;$('compactTables').checked=prefs.compact;document.body.classList.toggle('compactTables',prefs.compact);}
+function savePrefs(){prefs={currency:$('currencySelect').value,fee:Number($('feeSelect').value),autoRefresh:$('autoRefresh').checked,compact:$('compactTables').checked};localStorage.setItem(STORAGE_PREFS,JSON.stringify(prefs));document.body.classList.toggle('compactTables',prefs.compact);if(prefs.autoRefresh)startQuoteTimer();else if(quoteTimer){clearInterval(quoteTimer);quoteTimer=null;}renderAll();toast('Preferences saved. Currency setting changes display only; it does not convert your assets.');}
+$('savePreferences').addEventListener('click',savePrefs);$('autoRefresh').addEventListener('change',()=>{if($('autoRefresh').checked)startQuoteTimer();else if(quoteTimer){clearInterval(quoteTimer);quoteTimer=null;}});
+$('resetAccount').addEventListener('click',()=>{if(!confirm('Reset this paper account to $100,000 virtual cash? Holdings and trade history will be deleted from this browser.'))return;account=defaultAccount(account.displayName||activeUser);saveAccount();renderAll();toast('Paper account reset. You have $100,000 virtual cash again.');});
+function download(filename,text,type){const blob=new Blob([text],{type:type||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+$('exportActivity').addEventListener('click',()=>{const rows=[['time','side','symbol','quantity','price','gross','fee'],...account.trades.map(t=>[t.time,t.side,t.symbol,t.qty,t.price.toFixed(4),t.total.toFixed(2),t.fee.toFixed(2)])];download('market-lab-activity.csv',rows.map(r=>r.join(',')).join('\r\n'),'text/csv;charset=utf-8');});
+$('exportPortfolio').addEventListener('click',()=>download('market-lab-paper-portfolio.json',JSON.stringify({user:activeUser,account,preferences:prefs},null,2),'application/json'));
+$('helpBtn').addEventListener('click',()=>setPage('learn'));
+function simulateTick(){
+ if(!prefs.autoRefresh)return;
+ assets.forEach(a=>{
+  const drift=randomBetween(-.0028,.0028),old=a.price,close=Math.max(.5,old*(1+drift)),wick=close*randomBetween(.0005,.0035);
+  const prev=a.history[a.history.length-1];a.history.push({open:old,close,high:Math.max(old,close)+wick,low:Math.max(.01,Math.min(old,close)-wick),volume:Math.floor(randomBetween(80000,2800000))});if(a.history.length>160)a.history.shift();
+  a.price=close;a.volume=Math.max(50000,a.volume+Math.floor(randomBetween(-150000,200000)));
+ });
+ if(account){account.equityHistory.push(equity());if(account.equityHistory.length>100)account.equityHistory.shift();saveAccount();renderOverview();if($('page-markets').classList.contains('active'))renderMarketRows();if($('page-portfolio').classList.contains('active'))renderPortfolio();renderSelectedAsset();}
+}
+function startQuoteTimer(){if(quoteTimer)clearInterval(quoteTimer);if(prefs.autoRefresh)quoteTimer=setInterval(simulateTick,5000);}
+function bindCanvasResize(){if(resizeTimer)clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawDecorChart();drawActiveChart();drawAllocation();},70);}
+window.addEventListener('resize',bindCanvasResize);
+function start(){initAssets();drawDecorChart();try{prefs={...prefs,...JSON.parse(localStorage.getItem(STORAGE_PREFS)||'{}')};}catch(e){}
+ $('currencySelect').value=prefs.currency||'USD';$('feeSelect').value=String(prefs.fee??FEE_DEFAULT);$('autoRefresh').checked=prefs.autoRefresh!==false;$('compactTables').checked=!!prefs.compact;
+ let session='';try{session=localStorage.getItem(STORAGE_SESSION)||'';}catch(e){}
+ const all=users();if(session&&all[session]){activeUser=session;loadAccount();account.displayName=all[session].displayName||account.displayName;showApp();startQuoteTimer();}
+}
+start();
 })();
 </script>
 </body>
