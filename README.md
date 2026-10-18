@@ -1,28 +1,29 @@
-# NET HY VỌNG — Mười Đêm Cuối
+# Market Lab — Paper Trading Simulator
 
-Game kinh dị 3D góc nhìn thứ nhất chạy trên trình duyệt, viết bằng HTML/CSS/JavaScript và Three.js. Các nhân vật được dựng trực tiếp từ các khối hình học 3D trong mã nguồn; không cần tải bộ model nặng.
+A responsive 2D stock-market practice dashboard built with HTML, CSS, JavaScript and Canvas 2D. No build step or framework is required.
 
-## Chơi game
+## Features
 
-- Mở [index.html](./index.html) bằng trình duyệt khi có kết nối Internet để tải Three.js từ CDN.
-- Máy tính: **WASD** di chuyển, **Shift** chạy, **E** tương tác, chuột để nhìn, **Esc** tạm dừng.
-- Điện thoại: kéo nửa trái màn hình để di chuyển, kéo nửa phải để nhìn, chạm nút **E** để tương tác.
+- Local sign-up/sign-in flow with a salted PBKDF2 password hash.
+- $100,000 in virtual starting capital for each local practice account.
+- Generated illustrative price movements for nine instruments (not live exchange quotes).
+- Canvas line and candlestick charts with selectable chart windows.
+- Simulated market buy/sell orders, quantity checks, configurable commission and holdings with average cost basis.
+- Portfolio equity, cash, invested value, unrealized profit/loss, allocation chart and order history.
+- Watchlist, ticker search, CSV/JSON export, preferences and educational notes.
+- Responsive dashboard for desktop and mobile.
 
-## Mục tiêu và kết thúc
+## Run locally
 
-- **Good Ending:** kiếm tiền và trả hết khoản nợ trước hạn.
-- **Bad Ending:** hết tiền, cạn sức khỏe hoặc hết 10 đêm mà chưa trả xong nợ.
-- **Secret Ending:** tìm đủ ba manh mối trong quán, sau đó tương tác với cửa hậu.
+Open `index.html` in a modern browser with JavaScript enabled. For account password hashing through Web Crypto, use HTTPS or localhost; GitHub Pages provides HTTPS automatically.
 
-Thu tiền tại các máy có khách; mua máy mới hoặc nâng cấp để tăng doanh thu. Dùng mì gói và nước để hồi đói, khát và sức khỏe. Chủ nợ có thể xuất hiện khi đêm xuống.
+## Publish with GitHub Pages
 
-## Xuất bản miễn phí bằng GitHub Pages
+1. Open **Settings → Pages** in the repository.
+2. Under **Build and deployment**, choose **Deploy from a branch**.
+3. Choose branch **main** and folder **/(root)**, then click **Save**.
+4. Once deployment is ready, the expected URL is `https://phucdepzai2012.github.io/netscary/`.
 
-1. Mở **Settings → Pages** trong repository.
-2. Ở phần **Build and deployment**, chọn **Deploy from a branch**.
-3. Chọn branch **main**, thư mục **/(root)** rồi bấm **Save**.
-4. Khi GitHub Pages hoàn tất triển khai, trang game sẽ có địa chỉ dạng `https://phucdepzai2012.github.io/netscary/`.
+## Important limitations
 
-## Hiệu năng
-
-Game giới hạn pixel ratio, tái sử dụng hình học và vật liệu, giới hạn ánh sáng đổ bóng và giữ mọi thành phần trong một file để triển khai đơn giản.
+This is a client-side educational prototype, not a production financial platform. Quotes are randomly generated in the browser; they are not real-time market prices. No real-money orders are sent. Account credentials, user data and portfolios are stored in local browser storage on the current device only, with no server-side authentication, recovery or cloud sync. Do not reuse an important password here.
