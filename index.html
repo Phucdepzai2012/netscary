@@ -329,32 +329,32 @@ function translateTextValue(raw,lang){
  if(lang==='vi'){
   out=VI_TEXT[trimmed];
   if(out===undefined){
-   let m=trimmed.match(/^(\\d+) open positions$/i);if(m)out=m[1]+' vị thế đang mở';
-   if(out===undefined&&(m=trimmed.match(/^(\\d+) instruments available$/i)))out=m[1]+' mã chứng khoán khả dụng';
+   let m=trimmed.match(/^(\d+) open positions$/i);if(m)out=m[1]+' vị thế đang mở';
+   if(out===undefined&&(m=trimmed.match(/^(\d+) instruments available$/i)))out=m[1]+' mã chứng khoán khả dụng';
    if(out===undefined&&(m=trimmed.match(/^Signed in as (.+)$/i)))out='Đã đăng nhập với: '+m[1];
-   if(out===undefined&&(m=trimmed.match(/^Good to see you, (.+)\\.$/i)))out='Rất vui được gặp bạn, '+m[1]+'.';
-   if(out===undefined&&(m=trimmed.match(/^Virtual starting capital: (.+)\\. No real funds are involved\\.$/i)))out='Vốn ảo ban đầu: '+m[1]+'. Không sử dụng tiền thật.';
-   if(out===undefined&&(m=trimmed.match(/^You start with (.+) in virtual capital\\.$/i)))out='Bạn bắt đầu với '+m[1]+' vốn ảo.';
-   if(out===undefined&&(m=trimmed.match(/^Reset this paper account to (.+) virtual cash\\? Holdings and trade history will be deleted from this browser\\.$/i)))out='Đặt lại tài khoản mô phỏng về '+m[1]+' tiền ảo? Tài sản và lịch sử giao dịch sẽ bị xóa khỏi trình duyệt này.';
-   if(out===undefined&&(m=trimmed.match(/^Paper account reset\\. You have (.+) virtual cash again\\.$/i)))out='Đã đặt lại tài khoản. Bạn có '+m[1]+' tiền ảo.';
-   if(out===undefined&&(m=trimmed.match(/^(.+) added to watchlist\\.$/i)))out='Đã thêm '+m[1]+' vào danh sách theo dõi.';
-   if(out===undefined&&(m=trimmed.match(/^(.+) removed from watchlist\\.$/i)))out='Đã xóa '+m[1]+' khỏi danh sách theo dõi.';
-   if(out===undefined&&(m=trimmed.match(/^Buy (\\d+) (.+) shares? at (.+)\\. Paper order filled\\.$/i)))out='Đã khớp lệnh mua '+m[1]+' cổ phiếu '+m[2]+' ở mức '+m[3]+'.';
-   if(out===undefined&&(m=trimmed.match(/^Sell (\\d+) (.+) shares? at (.+)\\. Paper order filled\\.$/i)))out='Đã khớp lệnh bán '+m[1]+' cổ phiếu '+m[2]+' ở mức '+m[3]+'.';
-   if(out===undefined&&(m=trimmed.match(/^(.+) added to watchlist\\.$/i)))out='Đã thêm '+m[1]+' vào danh sách theo dõi.';
+   if(out===undefined&&(m=trimmed.match(/^Good to see you, (.+)\.$/i)))out='Rất vui được gặp bạn, '+m[1]+'.';
+   if(out===undefined&&(m=trimmed.match(/^Virtual starting capital: (.+)\. No real funds are involved\.$/i)))out='Vốn ảo ban đầu: '+m[1]+'. Không sử dụng tiền thật.';
+   if(out===undefined&&(m=trimmed.match(/^You start with (.+) in virtual capital\.$/i)))out='Bạn bắt đầu với '+m[1]+' vốn ảo.';
+   if(out===undefined&&(m=trimmed.match(/^Reset this paper account to (.+) virtual cash\? Holdings and trade history will be deleted from this browser\.$/i)))out='Đặt lại tài khoản mô phỏng về '+m[1]+' tiền ảo? Tài sản và lịch sử giao dịch sẽ bị xóa khỏi trình duyệt này.';
+   if(out===undefined&&(m=trimmed.match(/^Paper account reset\. You have (.+) virtual cash again\.$/i)))out='Đã đặt lại tài khoản. Bạn có '+m[1]+' tiền ảo.';
+   if(out===undefined&&(m=trimmed.match(/^(.+) added to watchlist\.$/i)))out='Đã thêm '+m[1]+' vào danh sách theo dõi.';
+   if(out===undefined&&(m=trimmed.match(/^(.+) removed from watchlist\.$/i)))out='Đã xóa '+m[1]+' khỏi danh sách theo dõi.';
+   if(out===undefined&&(m=trimmed.match(/^Buy (\d+) (.+) shares? at (.+)\. Paper order filled\.$/i)))out='Đã khớp lệnh mua '+m[1]+' cổ phiếu '+m[2]+' ở mức '+m[3]+'.';
+   if(out===undefined&&(m=trimmed.match(/^Sell (\d+) (.+) shares? at (.+)\. Paper order filled\.$/i)))out='Đã khớp lệnh bán '+m[1]+' cổ phiếu '+m[2]+' ở mức '+m[3]+'.';
+   if(out===undefined&&(m=trimmed.match(/^(.+) added to watchlist\.$/i)))out='Đã thêm '+m[1]+' vào danh sách theo dõi.';
    if(out===undefined&&(m=trimmed.match(/^(.+) shares?$/i)))out=m[1]+' cổ phiếu';
   }
  }else{
   out=EN_TEXT[trimmed];
   if(out===undefined){
-   let m=trimmed.match(/^(\\d+) vị thế đang mở$/i);if(m)out=m[1]+' open positions';
-   if(out===undefined&&(m=trimmed.match(/^(\\d+) mã chứng khoán khả dụng$/i)))out=m[1]+' instruments available';
+   let m=trimmed.match(/^(\d+) vị thế đang mở$/i);if(m)out=m[1]+' open positions';
+   if(out===undefined&&(m=trimmed.match(/^(\d+) mã chứng khoán khả dụng$/i)))out=m[1]+' instruments available';
    if(out===undefined&&(m=trimmed.match(/^Đã đăng nhập với: (.+)$/i)))out='Signed in as '+m[1];
-   if(out===undefined&&(m=trimmed.match(/^Rất vui được gặp bạn, (.+)\\.$/i)))out='Good to see you, '+m[1]+'.';
-   if(out===undefined&&(m=trimmed.match(/^Vốn ảo ban đầu: (.+)\\. Không sử dụng tiền thật\\.$/i)))out='Virtual starting capital: '+m[1]+'. No real funds are involved.';
-   if(out===undefined&&(m=trimmed.match(/^Bạn bắt đầu với (.+) vốn ảo\\.$/i)))out='You start with '+m[1]+' in virtual capital.';
-   if(out===undefined&&(m=trimmed.match(/^Đã khớp lệnh mua (\\d+) cổ phiếu (.+) ở mức (.+)\\.$/i)))out='Buy '+m[1]+' '+m[2]+' shares at '+m[3]+'. Paper order filled.';
-   if(out===undefined&&(m=trimmed.match(/^Đã khớp lệnh bán (\\d+) cổ phiếu (.+) ở mức (.+)\\.$/i)))out='Sell '+m[1]+' '+m[2]+' shares at '+m[3]+'. Paper order filled.';
+   if(out===undefined&&(m=trimmed.match(/^Rất vui được gặp bạn, (.+)\.$/i)))out='Good to see you, '+m[1]+'.';
+   if(out===undefined&&(m=trimmed.match(/^Vốn ảo ban đầu: (.+)\. Không sử dụng tiền thật\.$/i)))out='Virtual starting capital: '+m[1]+'. No real funds are involved.';
+   if(out===undefined&&(m=trimmed.match(/^Bạn bắt đầu với (.+) vốn ảo\.$/i)))out='You start with '+m[1]+' in virtual capital.';
+   if(out===undefined&&(m=trimmed.match(/^Đã khớp lệnh mua (\d+) cổ phiếu (.+) ở mức (.+)\.$/i)))out='Buy '+m[1]+' '+m[2]+' shares at '+m[3]+'. Paper order filled.';
+   if(out===undefined&&(m=trimmed.match(/^Đã khớp lệnh bán (\d+) cổ phiếu (.+) ở mức (.+)\.$/i)))out='Sell '+m[1]+' '+m[2]+' shares at '+m[3]+'. Paper order filled.';
    if(out===undefined&&(m=trimmed.match(/^(.+) cổ phiếu$/i)))out=m[1]+' shares';
   }
  }
