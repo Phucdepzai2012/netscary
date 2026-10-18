@@ -400,7 +400,7 @@ function init3D(){
   const beamMat=new T.MeshBasicMaterial({color:0xffdda0,transparent:true,opacity:.11,depthWrite:false,side:T.DoubleSide});
   const beam=mesh(scene,new T.ConeGeometry(.25,1,18,1,true),beamMat,[0,0,0],[1,1,1]);beam.visible=false;
   const targetDot=mesh(scene,new T.SphereGeometry(.045,10,8),new T.MeshBasicMaterial({color:0xffdda0}),[0,0,0],[1,1,1]);targetDot.visible=false;
-  scene3d={T,scene,camera,renderer,ambient,fill,man,arm,beam,targetDot,torchBody,targetMode:'button',targetElement:$('loginTab'),clock:0};
+  scene3d={T,scene,camera,renderer,ambient,fill,man,arm,beam,targetDot,torchBody,targetMode:currentView==='exitView'?'camera':'button',targetElement:currentView==='menuView'?$('menuView').querySelector('[data-aim="play"]'):currentView==='settingsView'?$('saveSettings'):currentView==='gameView'?$('board').querySelector('[data-cell="4"]'):$('loginTab'),clock:0};
   $('sceneStatus').innerHTML='<span class="pulse"></span><span>3D CLAY SCENE ONLINE</span>';
   applySettings();
   function aimUpdate(){
