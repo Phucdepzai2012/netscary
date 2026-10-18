@@ -54,64 +54,6 @@ h1 span{color:var(--red)}
 </style>
 </head>
 <body>
-<script>
-/* Visible backup scene: guarantees a picture even if WebGL or the 3D script fails. */
-(function(){
- const c=document.createElement('canvas');c.id='fallbackScene';
- c.style.cssText='position:fixed;inset:0;width:100%;height:100%;display:block;z-index:1;pointer-events:none';
- document.body.appendChild(c);
- const g=c.getContext('2d');if(!g)return;
- let W=0,H=0,D=1,look=0;
- function polygon(points,fill,stroke,line=1){g.beginPath();g.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)g.lineTo(points[i][0],points[i][1]);g.closePath();g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=line;g.stroke();}}
- function draw(){
-  D=Math.min(devicePixelRatio||1,1.5);W=innerWidth;H=innerHeight;
-  if(c.width!==Math.round(W*D)||c.height!==Math.round(H*D)){c.width=Math.round(W*D);c.height=Math.round(H*D);}
-  g.setTransform(D,0,0,D,0,0);g.clearRect(0,0,W,H);
-  const sky=g.createLinearGradient(0,0,0,H*.58);sky.addColorStop(0,'#080c16');sky.addColorStop(1,'#33313a');g.fillStyle=sky;g.fillRect(0,0,W,H);
-  const horizon=H*.43,cx=W*.5+look*W*.035;
-  polygon([[0,0],[W,0],[W*.83,horizon],[W*.17,horizon]],'#20232d','#56515a',2);
-  polygon([[0,0],[W*.17,horizon],[W*.22,H*.72],[0,H]],'#282932','#54505a',2);
-  polygon([[W,0],[W*.83,horizon],[W*.78,H*.72],[W,H]],'#242630','#54505a',2);
-  polygon([[W*.17,horizon],[W*.83,horizon],[W,H],[0,H]],'#303239','#898078',2);
-  /* Floor tile lines converge toward the back wall. */
-  for(let i=-7;i<=7;i++){g.beginPath();g.moveTo(cx+i*W*.014,horizon);g.lineTo(W*.5+i*W*.105,H);g.strokeStyle='#9b968a28';g.lineWidth=1;g.stroke();}
-  for(let j=1;j<10;j++){const y=horizon+(H-horizon)*Math.pow(j/10,1.85);g.beginPath();g.moveTo(W*.17-(y-horizon)*.22,horizon===y?y:y);g.lineTo(W-(W*.17+(y-horizon)*.22),y);g.strokeStyle='#a59e9225';g.stroke();}
-  /* Back-wall sign with strong emissive-style glow. */
-  const sx=cx-W*.19,sy=H*.16,sw=W*.38,sh=H*.12;
-  g.save();g.shadowColor='#ef334e';g.shadowBlur=24;g.fillStyle='#0a101b';g.fillRect(sx,sy,sw,sh);g.strokeStyle='#ff465e';g.lineWidth=2;g.strokeRect(sx,sy,sw,sh);g.restore();
-  g.textAlign='center';g.textBaseline='middle';g.shadowColor='#ff3659';g.shadowBlur=18;g.fillStyle='#fff0e8';g.font='900 '+Math.max(16,Math.min(31,W*.033))+'px system-ui';g.fillText('NET HY VỌNG 24H',cx,sy+sh*.43);g.shadowBlur=0;g.fillStyle='#d8c6bc';g.font='bold '+Math.max(9,Math.min(12,W*.012))+'px system-ui';g.fillText('QUÁN NET CŨ  •  23:47',cx,sy+sh*.76);
-  /* Ceiling lamps. */
-  for(let i=-1;i<=1;i++){const x=cx+i*W*.18,y=H*.08+Math.abs(i)*H*.025;g.save();g.shadowColor='#c5e8ff';g.shadowBlur=15;g.fillStyle='#b9d6e0';g.fillRect(x-W*.035,y,W*.07,4);g.restore();}
-  /* Perspective desks, CRTs and cyan screens. */
-  for(let row=0;row<3;row++){
-   const baseY=horizon+(H-horizon)*(.2+row*.22),scale=.32+row*.34;
-   for(const side of [-1,1]){
-    const x=cx+side*W*(.13+row*.095);
-    const dw=W*.105*scale,dh=H*.075*scale,top=baseY-dh*.4;
-    polygon([[x-dw,top],[x+dw,top],[x+dw*1.08,top+dh],[x-dw*1.08,top+dh]],'#554336','#9a8064',1);
-    polygon([[x-dw*.72,top-dh*1.48],[x+dw*.72,top-dh*1.48],[x+dw*.72,top-dh*.25],[x-dw*.72,top-dh*.25]],'#10151e','#71828a',1);
-    const monitor=g.createLinearGradient(x,top-dh*1.4,x,top);monitor.addColorStop(0,'#145b6b');monitor.addColorStop(1,'#07131a');
-    g.fillStyle=monitor;g.fillRect(x-dw*.62,top-dh*1.38,dw*1.24,dh*.98);
-    g.save();g.strokeStyle='#64dce0aa';g.lineWidth=Math.max(1,scale);for(let line=0;line<3;line++){g.beginPath();g.moveTo(x-dw*.51,top-dh*1.2+line*dh*.22);g.lineTo(x+dw*(.12+(line%2)*.32),top-dh*1.2+line*dh*.22);g.stroke();}g.restore();
-    polygon([[x-dw*.12,top],[x+dw*.12,top],[x+dw*.12,top+dh*.26],[x-dw*.12,top+dh*.26]],'#3a414b','#78838b',1);
-   }
-  }
-  /* A distant, human-shaped silhouette gives the room a horror-game focal point. */
-  const hx=cx+W*.055,hy=horizon+H*.06,head=Math.max(7,W*.009);
-  g.save();g.shadowColor='#af1f37';g.shadowBlur=20;g.fillStyle='#090a0e';
-  g.beginPath();g.ellipse(hx,hy,head*.7,head*.86,0,0,Math.PI*2);g.fill();
-  polygon([[hx-head*.95,hy+head*.8],[hx+head*.95,hy+head*.8],[hx+head*1.55,hy+head*4.6],[hx-head*1.55,hy+head*4.6]],'#0b0b11','#34313a',1);
-  g.restore();
-  /* Vignette and always-readable failover label. */
-  const vignette=g.createRadialGradient(cx,H*.52,Math.min(W,H)*.13,cx,H*.52,Math.max(W,H)*.76);vignette.addColorStop(0,'#00000000');vignette.addColorStop(1,'#020308d9');g.fillStyle=vignette;g.fillRect(0,0,W,H);
-  g.textAlign='center';g.textBaseline='bottom';g.shadowBlur=0;g.fillStyle='#ffffff9c';g.font='11px system-ui';g.fillText('CHẾ ĐỘ HIỂN THỊ DỰ PHÒNG',W/2,H-14);
- }
- window.__showGameFallback=function(reason){c.style.display='block';draw();if(reason){g.save();g.setTransform(D,0,0,D,0,0);g.fillStyle='#08090df0';g.fillRect(12,H-62,Math.min(W-24,760),42);g.fillStyle='#ffb6b6';g.textAlign='left';g.textBaseline='middle';g.font='12px system-ui';g.fillText('Lỗi 3D: '+String(reason).slice(0,120),22,H-41);g.restore();}};
- window.__hideGameFallback=function(){c.style.display='none';};
- addEventListener('resize',draw);addEventListener('mousemove',e=>{look=(e.clientX/W-.5);if(c.style.display!=='none')draw();});
- draw();
-})();
-</script>
 <div id="hud">
   <div class="hudgroup"><div class="chip"><span class="label">Tiền mặt</span><strong id="money">1.500.000đ</strong></div><div class="chip"><span class="label">Khoản nợ</span><strong id="debt">10.000.000đ</strong></div></div>
   <div class="chip" id="daybox"><span class="label">Thời hạn</span><strong id="day">ĐÊM 01 / 10</strong><div id="daybar"><div id="dayfill"></div></div></div>
@@ -143,14 +85,19 @@ h1 span{color:var(--red)}
 (function(){
 'use strict';
 const $=id=>document.getElementById(id),THREE=window.THREE;
-window.addEventListener('error',e=>{const panel=document.getElementById('overlay'),story=document.getElementById('story');if(window.__showGameFallback)window.__showGameFallback(e.message||'Lỗi JavaScript');if(panel&&story&&e.message){panel.style.display='flex';story.textContent='LỖI KHỞI TẠO ĐỒ HỌA: '+e.message+'. Đã bật cảnh dự phòng để không còn màn hình đen.';}});
+window.addEventListener('error',e=>{const panel=document.getElementById('overlay'),story=document.getElementById('story');if(panel&&story&&e.message){panel.style.display='flex';story.textContent='LỖI KHỞI TẠO ĐỒ HỌA: '+e.message+'. Không bật cảnh 2D giả; vui lòng xem lỗi bên dưới.';}});
 window.addEventListener('unhandledrejection',e=>{const panel=document.getElementById('overlay'),story=document.getElementById('story');if(panel&&story){panel.style.display='flex';story.textContent='Không thể khởi tạo game: '+String(e.reason||'lỗi không xác định')+'. Hãy tải lại trang.';}});
-if(!THREE){$('heading').textContent='Không tải được đồ họa 3D';$('story').textContent='Hãy kiểm tra kết nối Internet rồi tải lại trang để nạp Three.js.';$('mainbtn').style.display='none';return;}
+if(!THREE){$('heading').textContent='Không tải được thư viện 3D';$('story').textContent='Không có thư viện Three.js nên game 3D không thể khởi động. Hãy thử tải lại hoặc mở trang bằng mạng khác.';$('mainbtn').style.display='none';return;}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const fmt=n=>Math.max(0,Math.round(n)).toLocaleString('vi-VN')+'đ';
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x151821);scene.fog=new THREE.FogExp2(0x151821,.012);
 const camera=new THREE.PerspectiveCamera(73,innerWidth/innerHeight,.08,70);camera.rotation.order='YXZ';
-const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
+let renderer;
+try{
+ renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:'high-performance'});
+}catch(webglError){
+ $('overlay').style.display='flex';$('eyebrow').textContent='LỖI ĐỒ HỌA';$('heading').textContent='THIẾT BỊ KHÔNG KHỞI TẠO ĐƯỢC 3D';$('story').textContent='Trình duyệt chưa tạo được WebGL: '+String(webglError&&webglError.message||webglError)+'. Hãy bật tăng tốc phần cứng trong trình duyệt hoặc thử Chrome/Edge mới nhất.';$('mainbtn').textContent='TẢI LẠI';$('mainbtn').onclick=()=>location.reload();throw webglError;
+}
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.25));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;renderer.outputEncoding=THREE.sRGBEncoding;renderer.toneMapping=THREE.NoToneMapping;renderer.toneMappingExposure=1;renderer.domElement.id='world';document.body.prepend(renderer.domElement);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const matCache=new Map();
@@ -375,10 +322,10 @@ function loop(now){
   const dt=Math.min((now-(loop.last||now))/1000,.04);loop.last=now;
   if(state==='play')updateWorld(dt);
   renderer.render(scene,camera);
-  if(window.__hideGameFallback)window.__hideGameFallback();
+  
  }catch(err){
   console.error('NET HY VỌNG render error:',err);
-  if(window.__showGameFallback)window.__showGameFallback(err&&err.message||err);
+  
   state='error';$('overlay').style.display='flex';$('eyebrow').textContent='LỖI KỸ THUẬT';$('heading').textContent='GAME GẶP LỖI';$('story').textContent=String(err&&err.stack||err||'Không rõ nguyên nhân');$('cards').style.display='none';$('controls').style.display='block';$('mainbtn').textContent='TẢI LẠI GAME';$('mainbtn').onclick=()=>location.reload();
  }
 }
