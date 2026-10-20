@@ -1,0 +1,21 @@
+{
+  "name": "SnapPaper — Quét tài liệu",
+  "short_name": "SnapPaper",
+  "description": "Quét giấy tờ, tự căn chỉnh phối cảnh và lưu ảnh hoặc PDF trên điện thoại.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#101613",
+  "theme_color": "#101916",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
